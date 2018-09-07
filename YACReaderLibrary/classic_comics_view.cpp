@@ -82,7 +82,6 @@ ClassicComicsView::ClassicComicsView(bool disableCollapsing, QWidget *parent)
 
 if (disableCollapsing)
     sVertical->setCollapsible(1,false);
-#endif
 
     if(settings->contains(COMICS_VIEW_FLOW_SPLITTER_STATUS))
         sVertical->restoreState(settings->value(COMICS_VIEW_FLOW_SPLITTER_STATUS).toByteArray());
