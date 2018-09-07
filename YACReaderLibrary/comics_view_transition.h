@@ -7,11 +7,13 @@ class ComicsViewTransition : public QWidget
 {
     Q_OBJECT
 public:
-    explicit ComicsViewTransition(QWidget *parent = 0);
+    explicit ComicsViewTransition(const QString& backgroundColor, QWidget *parent = 0);
     QSize sizeHint();
 
 protected:
     void paintEvent(QPaintEvent *);
+    QColor backgroundColor;
+    QPainter painter;
 };
 
 #endif // COMICS_VIEW_TRANSITION_H
