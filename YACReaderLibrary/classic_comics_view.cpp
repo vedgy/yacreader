@@ -8,8 +8,8 @@
 #include "yacreader_table_view.h"
 #include "yacreader_tool_bar_stretch.h"
 
-ClassicComicsView::ClassicComicsView(QWidget *parent)
-    :ComicsView(parent),searching(false)
+ClassicComicsView::ClassicComicsView(bool disableCollapsing, QWidget *parent)
+    :ComicsView(parent),searching(false),disableCollapsing(disableCollapsing)
 {
     QHBoxLayout * layout = new QHBoxLayout;
 
@@ -80,7 +80,7 @@ ClassicComicsView::ClassicComicsView(QWidget *parent)
 
     layout->setMargin(0);
 
-#ifdef Q_OS_MAC
+if (disableCollapsing)
     sVertical->setCollapsible(1,false);
 #endif
 
