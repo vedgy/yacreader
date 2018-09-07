@@ -28,7 +28,7 @@ YACReaderComicsViewsManager::YACReaderComicsViewsManager(QSettings *settings, co
     switch ((YACReader::ComicsViewStatus)settings->value(COMICS_VIEW_STATUS).toInt())
     {
     case Flow:
-        comicsView = classicComicsView = new ClassicComicsView();
+        comicsView = classicComicsView = new ClassicComicsView(theme.disableClassicViewCollapsing);
         comicsViewStatus = Flow;
         break;
 
@@ -44,13 +44,13 @@ YACReaderComicsViewsManager::YACReaderComicsViewsManager(QSettings *settings, co
         break;
 
     default:
-        comicsView = classicComicsView = new ClassicComicsView();
+        comicsView = classicComicsView = new ClassicComicsView(theme.disableClassicViewCollapsing);
         comicsViewStatus = Flow;
     }
 
     doComicsViewConnections();
 
-    comicsViewStack->addWidget(comicsViewTransition = new ComicsViewTransition());
+    comicsViewStack->addWidget(comicsViewTransition = new ComicsViewTransition(theme.comicsViewTransitionBackground));
     comicsViewStack->addWidget(emptyFolderWidget = new EmptyFolderWidget());
     comicsViewStack->addWidget(emptyLabelWidget = new EmptyLabelWidget());
     comicsViewStack->addWidget(emptySpecialList = new EmptySpecialListWidget());
@@ -234,7 +234,7 @@ void YACReaderComicsViewsManager::_toggleComicsView()
         libraryWindow->libraryToolBar->updateViewSelectorIcon(icoViewsButton);
 #endif
         if(classicComicsView == nullptr)
-            classicComicsView = new ClassicComicsView();
+            classicComicsView = new ClassicComicsView(theme.disableClassicViewCollapsing);
 
         switchToComicsView(infoComicsView, classicComicsView);
         comicsViewStatus = Flow;
