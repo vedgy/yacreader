@@ -22,9 +22,6 @@ signals:
 	void showOptions();
 	
 public slots:
-	void showUpDownButtons(bool show);
-	
-	//bool eventFilter(QObject *object, QEvent *event);
 	void select();
 	void deselect();
 	void setName(const QString & name);
@@ -35,8 +32,6 @@ private:
 	QLabel * nameLabel;
 
 	QToolButton * options;
-	QToolButton * up;
-	QToolButton * down;
 
 	bool isSelected;
 
