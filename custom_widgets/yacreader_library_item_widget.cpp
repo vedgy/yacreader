@@ -14,8 +14,6 @@ YACReaderLibraryItemWidget::YACReaderLibraryItemWidget(QString n/*ame*/, QString
 	mainLayout->setMargin(0);
 	mainLayout->setSpacing(0);
 
-	//installEventFilter(this);
-
     QPixmap iconPixmap(":/images/sidebar/libraryIcon.png");
 	icon = new QLabel(this);
     icon->setPixmap(iconPixmap);
@@ -31,25 +29,11 @@ YACReaderLibraryItemWidget::YACReaderLibraryItemWidget(QString n/*ame*/, QString
     options->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);
     options->setStyleSheet("QToolButton {border:none;}");
 	connect(options,SIGNAL(clicked()),this,SIGNAL(showOptions()));
-	/*up = new QToolButton(this);
-	up->setIcon(QIcon(":/images/libraryUp.png"));
-	up->setHidden(true);
-	up->setFixedWidth(18);
-	up->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);
-
-	down = new QToolButton(this);
-	down->setIcon(QIcon(":/images/libraryDown.png"));
-	down->setHidden(true);
-	down->setFixedWidth(18);
-	down->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Minimum);*/
-
 
 	mainLayout->addWidget(icon);
 	mainLayout->addWidget(nameLabel,Qt::AlignLeft);
 	mainLayout->addStretch();
 	mainLayout->addWidget(options);
-	/*mainLayout->addWidget(up);
-	mainLayout->addWidget(down);*/
 
 	setLayout(mainLayout);
 
@@ -70,45 +54,6 @@ void YACReaderLibraryItemWidget::showUpDownButtons(bool show)
 	down->setHidden(!show);
 }
 
-/*
-bool YACReaderLibraryItemWidget::eventFilter(QObject *object, QEvent *event){
-	if(!isSelected && object==this && (event->type()==QEvent::Enter))
-	{
-		QString styleSheet = "background-color:#5E5E5E; border-top: 1px solid #5E5E5E;border-bottom: 1px solid #5E5E5E; ";
-		setStyleSheet(styleSheet);
-
-		up->setHidden(false);
-		down->setHidden(false);
-		options->setHidden(false);
-
-		return true;
-	}
-	if(!isSelected && object==this && (event->type()==QEvent::Leave))
-	{
-		QString styleSheet = "background-color:#454545; border-top: 1px solid #454545;border-bottom: 1px solid #454545;";
-		setStyleSheet(styleSheet);
-
-		up->setHidden(true);
-		down->setHidden(true);
-		options->setHidden(true);
-
-		return true;
-	}
-
-	if(object==this && (event->type()==QEvent::MouseButtonRelease))
-	{
-		QString styleSheet = "background-color:#2E2E2E; border-top: 1px solid #1F1F1F;border-bottom: 1px solid #636363; padding-top:1px; padding-bottom:1px;";
-		setStyleSheet(styleSheet);
-		emit(selected(name,path));
-		isSelected = true;
-		return true;
-	}
-
-	return false;
-}*/
-
-
-
 void YACReaderLibraryItemWidget::deselect()
 {
     setStyleSheet(Theme::currentTheme().itemLibraryNoSelectedStyleSheet);
@@ -116,8 +61,6 @@ void YACReaderLibraryItemWidget::deselect()
     QPixmap iconPixmap(":/images/sidebar/libraryIcon.png");
 	icon->setPixmap(iconPixmap);
 
-	/*up->setHidden(true);
-	down->setHidden(true);*/
 	options->setHidden(true);
 
     isSelected = false;
