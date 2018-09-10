@@ -55,9 +55,10 @@
 #include "db_helper.h"
 #include "qnaturalsorting.h"
 #include "yacreader_global_gui.h"
+#include "theme.h"
+
 #include "QsLog.h"
 
-#ifdef Q_OS_MAC
 #include <QFileIconProvider>
 QIcon finishedFolderIcon;
 void drawMacOSXFinishedFolderIcon()
@@ -94,7 +95,6 @@ void drawMacOSXFinishedFolderIcon()
     }
     finishedFolderIcon.addPixmap(pixSelectedOn, QIcon::Selected, QIcon::On);
 }
-#endif
 
 #define ROOT 1
 
@@ -158,25 +158,25 @@ QVariant FolderModel::data(const QModelIndex &index, int role) const
         return toolTip;
     }
 
-	if (role == Qt::DecorationRole)
+    if (role == Qt::DecorationRole) {
+        if (Theme::currentTheme().useNativeFolderIcons) {
+            if(item->data(FolderModel::Finished).toBool()){
+                if(finishedFolderIcon.isNull()){
+                    drawMacOSXFinishedFolderIcon();
+                }
 
-#ifdef Q_OS_MAC
-        if(item->data(FolderModel::Finished).toBool()){
-            if(finishedFolderIcon.isNull()){
-                drawMacOSXFinishedFolderIcon();
+                return QVariant(finishedFolderIcon);
             }
-
-            return QVariant(finishedFolderIcon);
+            else {
+                return QVariant(QFileIconProvider().icon(QFileIconProvider::Folder));
+            }
+        } else {
+            if(item->data(FolderModel::Finished).toBool())
+                return QVariant(YACReader::noHighlightedIcon(":/images/sidebar/folder_finished.png"));
+            else
+                return QVariant(YACReader::noHighlightedIcon(":/images/sidebar/folder.png"));
         }
-        else {
-            return QVariant(QFileIconProvider().icon(QFileIconProvider::Folder));
-        }
-#else
-        if(item->data(FolderModel::Finished).toBool())
-            return QVariant(YACReader::noHighlightedIcon(":/images/sidebar/folder_finished.png"));
-        else
-            return QVariant(YACReader::noHighlightedIcon(":/images/sidebar/folder.png"));
-#endif
+    }
 
     if(role == FolderModel::CompletedRole)
         return item->data(FolderModel::Completed);
