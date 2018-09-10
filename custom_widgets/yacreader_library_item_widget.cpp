@@ -120,9 +120,7 @@ void YACReaderLibraryItemWidget::deselect()
 	down->setHidden(true);*/
 	options->setHidden(true);
 
-	isSelected = false;
-
-
+    isSelected = false;
 }
 
 void YACReaderLibraryItemWidget::select()
