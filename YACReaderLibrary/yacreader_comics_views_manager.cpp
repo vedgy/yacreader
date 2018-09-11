@@ -175,7 +175,7 @@ void YACReaderComicsViewsManager::switchToComicsView(ComicsView * from, ComicsVi
     //load content into current view
     libraryWindow->loadCoversFromCurrentModel();
 
-    if(!libraryWindow->searchEdit->text().isEmpty())
+    if(!libraryWindow->libraryToolBar->searchEdit->text().isEmpty())
     {
        comicsView->enableFilterMode(true);
     }
@@ -194,10 +194,9 @@ void YACReaderComicsViewsManager::_toggleComicsView()
     {
         QIcon icoViewsButton;
         icoViewsButton.addFile(":/images/main_toolbar/info.png", QSize(), QIcon::Normal);
-        libraryWindow->toggleComicsViewAction->setIcon(icoViewsButton);
-#ifdef Q_OS_MAC
+        libraryWindow->libraryToolBar->toggleComicsViewAction->setIcon(icoViewsButton);
         libraryWindow->libraryToolBar->updateViewSelectorIcon(icoViewsButton);
-#endif
+
         if(gridComicsView == nullptr)
             gridComicsView = new GridComicsView();
 
@@ -212,10 +211,9 @@ void YACReaderComicsViewsManager::_toggleComicsView()
     {
         QIcon icoViewsButton;
         icoViewsButton.addFile(":/images/main_toolbar/flow.png", QSize(), QIcon::Normal);
-        libraryWindow->toggleComicsViewAction->setIcon(icoViewsButton);
-#ifdef Q_OS_MAC
+        libraryWindow->libraryToolBar->toggleComicsViewAction->setIcon(icoViewsButton);
         libraryWindow->libraryToolBar->updateViewSelectorIcon(icoViewsButton);
-#endif
+
         if(infoComicsView == nullptr)
            infoComicsView = new InfoComicsView();
 
@@ -229,10 +227,9 @@ void YACReaderComicsViewsManager::_toggleComicsView()
     {
         QIcon icoViewsButton;
         icoViewsButton.addFile(":/images/main_toolbar/grid.png", QSize(), QIcon::Normal);
-        libraryWindow->toggleComicsViewAction->setIcon(icoViewsButton);
-#ifdef Q_OS_MAC
+        libraryWindow->libraryToolBar->toggleComicsViewAction->setIcon(icoViewsButton);
         libraryWindow->libraryToolBar->updateViewSelectorIcon(icoViewsButton);
-#endif
+
         if(classicComicsView == nullptr)
             classicComicsView = new ClassicComicsView(theme.disableClassicViewCollapsing);
 

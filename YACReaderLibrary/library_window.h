@@ -16,9 +16,8 @@
 
 #include <future>
 
-#ifdef Q_OS_MAC
-    #include "yacreader_macosx_toolbar.h"
-#endif
+#include "yacreader_library_toolbar.h"
+#include "yacreader_library_search_edit.h"
 
 class QTreeView;
 class QDirModel;
@@ -111,12 +110,6 @@ public:
 
 	QSize slideSizeW;
 	QSize slideSizeF;
-	//search filter
-#ifdef Q_OS_MAC
-    YACReaderMacOSXSearchLineEdit * searchEdit;
-#else
-    YACReaderSearchLineEdit * searchEdit;
-#endif
 
 	QString previousFilter;
 	QCheckBox * includeComicsCheckBox;
@@ -142,11 +135,6 @@ public:
 
 	bool fetching;
 
-	int i;
-
-	QAction  * backAction;
-	QAction  * forwardAction;
-
 	QAction * openComicAction;
 	QAction * createLibraryAction;
 	QAction * openLibraryAction;
@@ -158,15 +146,9 @@ public:
 	QAction * importLibraryAction;
 
 	QAction * updateLibraryAction;
-	QAction * removeLibraryAction;
-	QAction * helpAboutAction;
-	QAction * renameLibraryAction;
-#ifndef Q_OS_MAC
-	QAction * toggleFullScreenAction;
-#endif
-	QAction * optionsAction;
-	QAction * serverConfigAction;
-    QAction * toggleComicsViewAction;
+    QAction * removeLibraryAction;
+    QAction * renameLibraryAction;
+
 	//QAction * socialAction;
 
 	//tree actions
@@ -216,11 +198,8 @@ public:
     QAction * addToMenuAction;
     QAction * addToFavoritesAction;
 
-#ifdef Q_OS_MAC
-    YACReaderMacOSXToolbar * libraryToolBar;
-#else
-	YACReaderMainToolBar * libraryToolBar;
-#endif
+    YACReaderLibraryToolbar *libraryToolBar;
+
 	QToolBar * treeActions;
 	QToolBar * comicsToolBar;
 	QToolBar * editInfoToolBar;
