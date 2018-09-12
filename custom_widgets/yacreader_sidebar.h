@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 
+#include "theme.h"
+
 class YACReaderFoldersView;
 class YACReaderLibraryListWidget;
 class YACReaderSearchLineEdit;
@@ -41,6 +43,7 @@ protected:
     void closeEvent ( QCloseEvent * event );
     QSettings * settings;
     QSplitter * splitter;
+    Theme theme = Theme::currentTheme();
 	
 };
 
