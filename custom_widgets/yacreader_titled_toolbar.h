@@ -1,6 +1,8 @@
 #ifndef YACREADER_TITLED_TOOLBAR_H
 #define YACREADER_TITLED_TOOLBAR_H
 
+#include "theme.h"
+
 #include <QWidget>
 #include <QLabel>
 #include <QPaintEvent>
@@ -25,6 +27,8 @@ private:
 	QColor textColor;
 	void drawText(QPainter *painter, QPoint offset);
 	void drawTextEffect(QPainter* painter, QPoint offset);
+
+    Theme theme = Theme::currentTheme();
 };
 
 class YACReaderTitledToolBar : public QWidget
@@ -41,6 +45,7 @@ public slots:
     void addSepartor();
 private:
 	DropShadowLabel * nameLabel;
+    Theme theme = Theme::currentTheme();
 };
 
 #endif // YACREADER_TITLED_TOOLBAR_H
