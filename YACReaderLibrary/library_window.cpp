@@ -1622,12 +1622,12 @@ void LibraryWindow::onAddComicsToLabel()
 
 void LibraryWindow::setToolbarTitle(const QModelIndex &modelIndex)
 {
-#ifndef Q_OS_MAC
-    if(!modelIndex.isValid())
-        libraryToolBar->setCurrentFolderName(selectedLibrary->currentText());
-    else
-        libraryToolBar->setCurrentFolderName(modelIndex.data().toString());
-#endif
+    if (!theme.isMacosNative) {
+        if(!modelIndex.isValid())
+            libraryToolBar->setTitle(selectedLibrary->currentText());
+        else
+            libraryToolBar->setTitle(modelIndex.data().toString());
+    }
 }
 
 void LibraryWindow::saveSelectedCoversTo()
@@ -1917,10 +1917,11 @@ void LibraryWindow::rename(QString newName) //TODO replace
 			selectedLibrary->renameCurrentLibrary(newName);
 			libraries.save();
 			renameLibraryDialog->close();
-#ifndef Q_OS_MAC
-            if(!foldersModelProxy->mapToSource(foldersView->currentIndex()).isValid())
-				libraryToolBar->setCurrentFolderName(selectedLibrary->currentText());
-#endif
+
+            if (!theme.isMacosNative) {
+                if(!foldersModelProxy->mapToSource(foldersView->currentIndex()).isValid())
+                    libraryToolBar->setTitle(selectedLibrary->currentText());
+            }
 		}
 		else
 		{
