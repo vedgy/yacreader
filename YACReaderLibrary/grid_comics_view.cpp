@@ -295,7 +295,7 @@ void GridComicsView::toNormal()
 
 void GridComicsView::updateConfig(QSettings *settings)
 {
-    Q_UNUSED(settings);
+    setCurrentComicIfNeeded();
 }
 
 void GridComicsView::enableFilterMode(bool enabled)
@@ -379,7 +379,8 @@ void GridComicsView::setCurrentComicIfNeeded()
 
     bool showCurrentComic = found &&
             filterEnabled == false &&
-            (mode == ComicModel::Mode::Folder || mode == ComicModel::Mode::ReadingList);
+            (mode == ComicModel::Mode::Folder || mode == ComicModel::Mode::ReadingList) &&
+            settings->value(SHOW_CURRENT_COMIC_BANNER_IN_GRID_VIEW, true).toBool();
 
     if (showCurrentComic) {
         ctxt->setContextProperty("currentComic", &currentComic);

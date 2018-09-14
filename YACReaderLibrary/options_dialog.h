@@ -24,10 +24,12 @@ Q_OBJECT
         void backgroundImageOpacitySliderChanged(int value);
         void backgroundImageBlurRadiusSliderChanged(int value);
         void useCurrentComicCoverCheckClicked(bool checked);
+        void showCurrentComicBannerCheckClicked(bool checked);
         void resetToDefaults();
     private:
         QCheckBox * useBackgroundImageCheck;
         QCheckBox * useCurrentComicCoverCheck;
+        QCheckBox * showCurrentComicBanner;
         QSlider * backgroundImageOpacitySlider;
         QSlider * backgroundImageBlurRadiusSlider;
         QLabel * opacityLabel;
