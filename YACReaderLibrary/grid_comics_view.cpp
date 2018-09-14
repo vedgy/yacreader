@@ -295,6 +295,8 @@ void GridComicsView::toNormal()
 
 void GridComicsView::updateConfig(QSettings *settings)
 {
+    Q_UNUSED(settings);
+
     setCurrentComicIfNeeded();
 }
 
