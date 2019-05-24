@@ -260,10 +260,6 @@ PageLoader::PageLoader(QMutex * m):
 
 PageLoader::~PageLoader()
 {
-	mutex->lock();
-	condition.wakeOne();
-	mutex->unlock();
-	wait();
 }
 
 bool PageLoader::busy() const
@@ -278,47 +274,13 @@ void PageLoader::generate(int index, QSize size,const QByteArray & rImage)
 	//this->img = QImage();
 	this->size = size;
 	this->rawImage = rImage;
+	QImage image;
+	image.loadFromData(this->rawImage);
+	// let everyone knows it is ready
+	this->img = image.scaled(this->size,Qt::KeepAspectRatio,Qt::SmoothTransformation);
 	mutex->unlock();
-
-	if (!isRunning())
-		start();
-	else
-	{
-		mutex->lock();
-		// already running, wake up whenever ready
-		restart = true;
-		condition.wakeOne();
-		mutex->unlock();
-	}
 }
 
 void PageLoader::run()
 {
-	for(;;)
-	{
-		// copy necessary data
-		mutex->lock();
-		this->working = true;
-		//int idx = this->idx;
-
-
-		QImage image;
-		image.loadFromData(this->rawImage);
-		// let everyone knows it is ready
-		image = image.scaled(this->size,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-
-		mutex->unlock();
-
-		mutex->lock();
-		this->working = false;
-		this->img = image;
-		mutex->unlock();
-
-		// put to sleep
-		mutex->lock();
-		if (!this->restart)
-			condition.wait(mutex);
-		restart = false;
-		mutex->unlock();
-	}
 }
