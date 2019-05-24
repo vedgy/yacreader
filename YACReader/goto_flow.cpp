@@ -284,9 +284,11 @@ void PageLoader::generate(int index, QSize size,const QByteArray & rImage)
 		start();
 	else
 	{
+		mutex->lock();
 		// already running, wake up whenever ready
 		restart = true;
 		condition.wakeOne();
+		mutex->unlock();
 	}
 }
 
