@@ -369,7 +369,7 @@ state(0), target(0), step(0), frame(0), animating(false)
 }
 
 void PictureFlowAnimator::start(int slide)
-{
+{return;
   target = slide;
   if(!animateTimer.isActive() && state)
   {
@@ -390,7 +390,7 @@ void PictureFlowAnimator::stop(int slide)
 }
 
 void PictureFlowAnimator::update()
-{
+{return;
   /*if(!animateTimer.isActive())
 	return;*/
   if(step == 0)
@@ -1033,9 +1033,9 @@ PictureFlow::PictureFlow(QWidget* parent,FlowType flowType): QWidget(parent)
 
   d->animator = new PictureFlowAnimator;
   d->animator->state = d->state;
-  QObject::connect(&d->animator->animateTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
+ // QObject::connect(&d->animator->animateTimer, SIGNAL(timeout()), this, SLOT(updateAnimation()));
 
-  QObject::connect(&d->triggerTimer, SIGNAL(timeout()), this, SLOT(render()));
+  //QObject::connect(&d->triggerTimer, SIGNAL(timeout()), this, SLOT(render()));
 
 #ifdef PICTUREFLOW_QT4
   setAttribute(Qt::WA_StaticContents, true);
@@ -1193,7 +1193,7 @@ void PictureFlow::render()
 }
 
 void PictureFlow::triggerRender()
-{
+{return;
 #ifdef PICTUREFLOW_QT4
   d->triggerTimer.setSingleShot(true);
   d->triggerTimer.start(0);
@@ -1371,10 +1371,10 @@ void PictureFlow::updateAnimation()  //bucle principal
   {
 	  int difference = 10-now.elapsed();
 	  if(difference >= 0 && !frameSkiped)
-		QTimer::singleShot(difference, this, SLOT(updateAnimation()));
+	;//	QTimer::singleShot(difference, this, SLOT(updateAnimation()));
 	  else
 	  {
-		  QTimer::singleShot(0, this, SLOT(updateAnimation()));
+		//  QTimer::singleShot(0, this, SLOT(updateAnimation()));
 		  if(!frameSkiped)
 			framesSkip = -( (difference - 10) / 10); 
 	  }
