@@ -4,7 +4,6 @@
 #include <QScrollArea>
 #include <QToolBar>
 #include <QAction>
-#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QCloseEvent>
 #include <QSettings>
@@ -162,7 +161,6 @@ private:
     void getSiblingComics(QString path, QString currentComic);
 
     //! Manejadores de evento:
-    void keyPressEvent(QKeyEvent *event) override;
     //void resizeEvent(QResizeEvent * event);
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void dropEvent(QDropEvent *event) override;
