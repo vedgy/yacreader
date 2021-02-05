@@ -204,12 +204,6 @@ QImage MedianNoiseReductionFilter::setFilter(const QImage &image)
 //-----------------------------------------------------------------------------
 // BrightnessFilter
 //-----------------------------------------------------------------------------
-BrightnessFilter::BrightnessFilter(int l)
-    : ImageFilter()
-{
-    level = l;
-}
-
 QImage BrightnessFilter::setFilter(const QImage &image)
 {
     /*int width = image.width();
@@ -233,12 +227,6 @@ QImage BrightnessFilter::setFilter(const QImage &image)
 //-----------------------------------------------------------------------------
 // ContrastFilter
 //-----------------------------------------------------------------------------
-ContrastFilter::ContrastFilter(int l)
-    : ImageFilter()
-{
-    level = l;
-}
-
 QImage ContrastFilter::setFilter(const QImage &image)
 {
     /*int width = image.width();
@@ -307,12 +295,6 @@ QImage ContrastFilter::setFilter(const QImage &image)
 //-----------------------------------------------------------------------------
 // ContrastFilter
 //-----------------------------------------------------------------------------
-GammaFilter::GammaFilter(int l)
-    : ImageFilter()
-{
-    level = l;
-}
-
 QImage GammaFilter::setFilter(const QImage &image)
 {
     if (level == -1) {

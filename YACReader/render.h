@@ -21,14 +21,14 @@ class Render;
 class ImageFilter
 {
 public:
-    ImageFilter() {};
-    virtual ~ImageFilter() {};
+    ImageFilter() = default;
+    virtual ~ImageFilter() = default;
     virtual QImage setFilter(const QImage &image) = 0;
     inline int getLevel() { return level; };
     inline void setLevel(int l) { level = l; };
 
 protected:
-    int level;
+    int level = -1;
 };
 
 class MeanNoiseReductionFilter : public ImageFilter
@@ -58,21 +58,18 @@ private:
 class BrightnessFilter : public ImageFilter
 {
 public:
-    BrightnessFilter(int l = -1);
     QImage setFilter(const QImage &image) override;
 };
 
 class ContrastFilter : public ImageFilter
 {
 public:
-    ContrastFilter(int l = -1);
     QImage setFilter(const QImage &image) override;
 };
 
 class GammaFilter : public ImageFilter
 {
 public:
-    GammaFilter(int l = -1);
     QImage setFilter(const QImage &image) override;
 };
 
