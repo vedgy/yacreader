@@ -209,9 +209,6 @@ private:
     int numRightPages;
     QList<PageRender *> pageRenders;
     QList<QImage *> buffer;
-    void loadAll();
-    void updateRightPages();
-    void updateLeftPages();
     bool loadedComic;
     QList<int> pagesEmited;
     QVector<bool> pagesReady;
