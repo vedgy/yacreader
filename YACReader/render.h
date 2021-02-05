@@ -18,14 +18,17 @@ class Comic;
 class ComicDB;
 class Render;
 
+struct ColorAdjustments {
+    int brightness, contrast, gamma;
+};
+
 class ImageFilter
 {
 public:
     ImageFilter() = default;
     virtual ~ImageFilter() = default;
     virtual QImage setFilter(const QImage &image) = 0;
-    inline int getLevel() { return level; };
-    inline void setLevel(int l) { level = l; };
+    virtual void setLevel(ColorAdjustments adjustments) = 0;
 
 protected:
     int level = -1;
@@ -59,18 +62,21 @@ class BrightnessFilter : public ImageFilter
 {
 public:
     QImage setFilter(const QImage &image) override;
+    void setLevel(ColorAdjustments adjustments) override { level = adjustments.brightness; }
 };
 
 class ContrastFilter : public ImageFilter
 {
 public:
     QImage setFilter(const QImage &image) override;
+    void setLevel(ColorAdjustments adjustments) override { level = adjustments.contrast; }
 };
 
 class GammaFilter : public ImageFilter
 {
 public:
     QImage setFilter(const QImage &image) override;
+    void setLevel(ColorAdjustments adjustments) override { level = adjustments.gamma; }
 };
 
 //-----------------------------------------------------------------------------
@@ -133,6 +139,7 @@ public:
 
     int getIndex() const;
     int numPages() const;
+    void updateFilters(ColorAdjustments adjustments);
 
 public slots:
     void render();
@@ -175,7 +182,6 @@ public slots:
     void save();
     void reset();
     void reload();
-    void updateFilters(int brightness, int contrast, int gamma);
     Bookmarks *getBookmarks();
     //sets the firt page to render
     void renderAt(int page);
@@ -198,6 +204,8 @@ signals:
     void bookmarksUpdated();
 
 private:
+    void setAllLevels(ColorAdjustments adjustments);
+
     Comic *comic;
     bool doublePage;
     bool doubleMangaPage;

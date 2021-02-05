@@ -1092,7 +1092,7 @@ void Viewer::updateImageOptions()
 
 void Viewer::updateFilters(int brightness, int contrast, int gamma)
 {
-    render->updateFilters(brightness, contrast, gamma);
+    render->updateFilters({ brightness, contrast, gamma });
 }
 
 void Viewer::setBookmarks()

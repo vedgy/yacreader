@@ -165,7 +165,7 @@ void MainWindowViewer::setupUI()
     optionsDialog = new OptionsDialog(this);
     connect(optionsDialog, SIGNAL(accepted()), viewer, SLOT(updateOptions()));
     connect(optionsDialog, SIGNAL(optionsChanged()), this, SLOT(reloadOptions()));
-    connect(optionsDialog, SIGNAL(changedFilters(int, int, int)), viewer, SLOT(updateFilters(int, int, int)));
+    connect(optionsDialog, &OptionsDialog::changedFilters, viewer, &Viewer::updateFilters);
     connect(optionsDialog, &OptionsDialog::changedImageOptions, viewer, &Viewer::updatePage);
 
     optionsDialog->restoreOptions(settings);

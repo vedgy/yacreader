@@ -7,8 +7,6 @@
 #include <QApplication>
 #include <QImage>
 
-#include <typeinfo>
-
 #include "comic_db.h"
 #include "yacreader_global_gui.h"
 #include "configuration.h"
@@ -644,26 +642,15 @@ void Render::load(const QString &path, int atPage)
 void Render::load(const QString &path, const ComicDB &comicDB)
 {
     //TODO prepare filters
-    for (int i = 0; i < filters.count(); i++) {
-        if (typeid(*filters[i]) == typeid(BrightnessFilter)) {
-            if (comicDB.info.brightness == -1)
-                filters[i]->setLevel(0);
-            else
-                filters[i]->setLevel(comicDB.info.brightness);
-        }
-        if (typeid(*filters[i]) == typeid(ContrastFilter)) {
-            if (comicDB.info.contrast == -1)
-                filters[i]->setLevel(100);
-            else
-                filters[i]->setLevel(comicDB.info.contrast);
-        }
-        if (typeid(*filters[i]) == typeid(GammaFilter)) {
-            if (comicDB.info.gamma == -1)
-                filters[i]->setLevel(100);
-            else
-                filters[i]->setLevel(comicDB.info.gamma);
-        }
+    {
+        const auto &info = comicDB.info;
+        ColorAdjustments adjustments;
+        adjustments.brightness = info.brightness == -1 ? 0 : info.brightness;
+        adjustments.contrast = info.contrast == -1 ? 100 : info.contrast;
+        adjustments.gamma = info.gamma == -1 ? 100 : info.gamma;
+        setAllLevels(adjustments);
     }
+
     createComic(path);
     if (comic != nullptr) {
         loadComic(path, comicDB);
@@ -1071,16 +1058,15 @@ void Render::reload()
     }
 }
 
-void Render::updateFilters(int brightness, int contrast, int gamma)
+void Render::updateFilters(ColorAdjustments adjustments)
 {
-    for (int i = 0; i < filters.count(); i++) {
-        if (typeid(*filters[i]) == typeid(BrightnessFilter))
-            filters[i]->setLevel(brightness);
-        if (typeid(*filters[i]) == typeid(ContrastFilter))
-            filters[i]->setLevel(contrast);
-        if (typeid(*filters[i]) == typeid(GammaFilter))
-            filters[i]->setLevel(gamma);
-    }
-
+    setAllLevels(adjustments);
     reload();
+}
+
+void Render::setAllLevels(ColorAdjustments adjustments)
+{
+    std::for_each(filters.begin(), filters.end(), [adjustments](ImageFilter *filter) {
+        filter->setLevel(adjustments);
+    });
 }
