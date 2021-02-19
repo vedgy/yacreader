@@ -284,7 +284,6 @@ public:
 
     QString currentPath() const;
     QString absoluteFolderPath(const QModelIndex &sourceIndex) const;
-    QString currentFolderPath();
 
     //settings
     QSettings *settings;
@@ -389,9 +388,8 @@ public slots:
     QProgressDialog *newProgressDialog(const QString &label, int maxValue);
     void reloadAfterCopyMove(const QModelIndex &mi);
     void reloadComicsView();
-    QModelIndex getCurrentFolderIndex();
     void enableNeededActions();
-    void addFolderToCurrentIndex();
+    void addFolderToSelectedIndex();
     void deleteSelectedFolder();
     void errorDeletingFolder();
     void addNewReadingList();
@@ -416,6 +414,15 @@ public slots:
 private:
     //! @return The type of the current source container or SourceType::None if search mode is active.
     YACReaderLibrarySourceContainer::SourceType currentSourceType() const;
+    //! @return The current index in Folder/List history.
+    QModelIndex currentSourceModelIndex() const;
+
+    //! @return The foldersModel's (source) folder index currently loaded in the
+    //! comics view or an empty index if a list is loaded or if search mode is active.
+    QModelIndex getCurrentFolderIndex() const;
+    //! @return The selected foldersModel's (source) folder index or an empty index
+    //! if no folder is currently selected.
+    QModelIndex getSelectedFolderIndex() const;
 
     YACReader::SearchModifiers lastSearchModifiers;
     QString lastSearchFilter;

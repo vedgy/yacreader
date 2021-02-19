@@ -1111,7 +1111,7 @@ void LibraryWindow::createConnections()
     connect(removeLibraryAction, SIGNAL(triggered()), this, SLOT(removeLibrary()));
     connect(openComicAction, SIGNAL(triggered()), this, SLOT(openComic()));
     connect(helpAboutAction, SIGNAL(triggered()), had, SLOT(show()));
-    connect(addFolderAction, SIGNAL(triggered()), this, SLOT(addFolderToCurrentIndex()));
+    connect(addFolderAction, &QAction::triggered, this, &LibraryWindow::addFolderToSelectedIndex);
     connect(deleteFolderAction, SIGNAL(triggered()), this, SLOT(deleteSelectedFolder()));
     connect(setRootIndexAction, SIGNAL(triggered()), this, SLOT(setRootIndex()));
     connect(expandAllNodesAction, SIGNAL(triggered()), foldersView, SLOT(expandAll()));
@@ -1166,8 +1166,10 @@ void LibraryWindow::createConnections()
     connect(showEditShortcutsAction, SIGNAL(triggered()), editShortcutsDialog, SLOT(show()));
 
     //update folders (partial updates)
-    connect(updateCurrentFolderAction, SIGNAL(triggered()), this, SLOT(updateCurrentFolder()));
-    connect(updateFolderAction, SIGNAL(triggered()), this, SLOT(updateCurrentFolder()));
+    connect(updateCurrentFolderAction, &QAction::triggered, this, &LibraryWindow::updateCurrentFolder);
+    connect(updateFolderAction, &QAction::triggered, this, [this] {
+        updateFolder(getSelectedFolderIndex());
+    });
 
     //lists
     connect(addReadingListAction, SIGNAL(triggered()), this, SLOT(addNewReadingList()));
@@ -1345,9 +1347,8 @@ void LibraryWindow::copyAndImportComicsToCurrentFolder(const QList<QPair<QString
 {
     QLOG_DEBUG() << "-copyAndImportComicsToCurrentFolder-";
     if (comics.size() > 0) {
-        QString destFolderPath = currentFolderPath();
-
-        QModelIndex folderDestination = getCurrentFolderIndex();
+        const QModelIndex folderDestination = getCurrentFolderIndex();
+        const QString destFolderPath = absoluteFolderPath(folderDestination);
 
         QProgressDialog *progressDialog = newProgressDialog(tr("Copying comics..."), comics.size());
 
@@ -1362,9 +1363,8 @@ void LibraryWindow::moveAndImportComicsToCurrentFolder(const QList<QPair<QString
 {
     QLOG_DEBUG() << "-moveAndImportComicsToCurrentFolder-";
     if (comics.size() > 0) {
-        QString destFolderPath = currentFolderPath();
-
-        QModelIndex folderDestination = getCurrentFolderIndex();
+        const QModelIndex folderDestination = getCurrentFolderIndex();
+        const QString destFolderPath = absoluteFolderPath(folderDestination);
 
         QProgressDialog *progressDialog = newProgressDialog(tr("Moving comics..."), comics.size());
 
@@ -1487,7 +1487,14 @@ void LibraryWindow::reloadComicsView()
         navigationController->loadPreviousStatus(YACReaderNavigationController::LoadScope::ComicsView);
 }
 
-QModelIndex LibraryWindow::getCurrentFolderIndex()
+QModelIndex LibraryWindow::getCurrentFolderIndex() const
+{
+    if (currentSourceType() == YACReaderLibrarySourceContainer::Folder)
+        return currentSourceModelIndex();
+    return QModelIndex();
+}
+
+QModelIndex LibraryWindow::getSelectedFolderIndex() const
 {
     if (foldersView->selectionModel()->selectedRows().length() > 0)
         return foldersModelProxy->mapToSource(foldersView->currentIndex());
@@ -1506,9 +1513,9 @@ void LibraryWindow::enableNeededActions()
     disableLibrariesActions(false);
 }
 
-void LibraryWindow::addFolderToCurrentIndex()
+void LibraryWindow::addFolderToSelectedIndex()
 {
-    QModelIndex currentIndex = getCurrentFolderIndex();
+    const QModelIndex selectedIndex = getSelectedFolderIndex();
 
     bool ok;
     QString newFolderName = QInputDialog::getText(this, tr("Add new folder"),
@@ -1520,11 +1527,11 @@ void LibraryWindow::addFolderToCurrentIndex()
     bool isValid = !newFolderName.contains(invalidChars);
 
     if (ok && !newFolderName.isEmpty() && isValid) {
-        QString parentPath = absoluteFolderPath(currentIndex);
+        QString parentPath = absoluteFolderPath(selectedIndex);
         QDir parentDir(parentPath);
         QDir newFolder(parentPath + "/" + newFolderName);
         if (parentDir.mkdir(newFolderName) || newFolder.exists()) {
-            QModelIndex newIndex = foldersModel->addFolderAtParent(newFolderName, currentIndex);
+            const QModelIndex newIndex = foldersModel->addFolderAtParent(newFolderName, selectedIndex);
             foldersView->setCurrentIndex(foldersModelProxy->mapFromSource(newIndex));
             navigationController->loadFolderInfo(newIndex);
             historyController->updateHistory(YACReaderLibrarySourceContainer(newIndex, YACReaderLibrarySourceContainer::Folder));
@@ -1536,11 +1543,11 @@ void LibraryWindow::addFolderToCurrentIndex()
 
 void LibraryWindow::deleteSelectedFolder()
 {
-    QModelIndex currentIndex = getCurrentFolderIndex();
-    QString relativePath = foldersModel->getFolderPath(currentIndex);
+    const QModelIndex selectedIndex = getSelectedFolderIndex();
+    const QString relativePath = foldersModel->getFolderPath(selectedIndex);
     QString folderPath = QDir::cleanPath(currentPath() + relativePath);
 
-    if (!currentIndex.isValid())
+    if (!selectedIndex.isValid())
         QMessageBox::information(this, tr("No folder selected"), tr("Please, select a folder first"));
     else {
         QString libraryPath = QDir::cleanPath(currentPath());
@@ -1552,7 +1559,7 @@ void LibraryWindow::deleteSelectedFolder()
             if (ret == QMessageBox::Yes) {
                 //no folders multiselection by now
                 QModelIndexList indexList;
-                indexList << currentIndex;
+                indexList << selectedIndex;
 
                 QList<QString> paths;
                 paths << folderPath;
@@ -2418,20 +2425,6 @@ QString LibraryWindow::absoluteFolderPath(const QModelIndex &sourceIndex) const
     return QDir::cleanPath(currentPath() + foldersModel->getFolderPath(sourceIndex));
 }
 
-QString LibraryWindow::currentFolderPath()
-{
-    QString path;
-
-    if (foldersView->selectionModel()->selectedRows().length() > 0)
-        path = foldersModel->getFolderPath(foldersModelProxy->mapToSource(foldersView->currentIndex()));
-    else
-        path = foldersModel->getFolderPath(QModelIndex());
-
-    QLOG_DEBUG() << "current folder path : " << QDir::cleanPath(currentPath() + path);
-
-    return QDir::cleanPath(currentPath() + path);
-}
-
 void LibraryWindow::showExportComicsInfo()
 {
     exportComicsInfoDialog->source = currentPath() + "/.yacreaderlibrary/library.ydb";
@@ -2692,4 +2685,9 @@ YACReaderLibrarySourceContainer::SourceType LibraryWindow::currentSourceType() c
     Q_ASSERT_X(type != YACReaderLibrarySourceContainer::None, Q_FUNC_INFO,
                "History controller does not store search states.");
     return type;
+}
+
+QModelIndex LibraryWindow::currentSourceModelIndex() const
+{
+    return historyController->currentSourceContainer().getSourceModelIndex();
 }
