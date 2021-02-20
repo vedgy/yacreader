@@ -2366,12 +2366,7 @@ void LibraryWindow::openContainingFolderComic()
 
 void LibraryWindow::openContainingFolder()
 {
-    QModelIndex modelIndex = foldersModelProxy->mapToSource(foldersView->currentIndex());
-    QString path;
-    if (modelIndex.isValid())
-        path = QDir::cleanPath(currentPath() + foldersModel->getFolderPath(modelIndex));
-    else
-        path = QDir::cleanPath(currentPath());
+    QString path = absoluteFolderPath(getSelectedFolderIndex());
     QDesktopServices::openUrl(QUrl("file:///" + path, QUrl::TolerantMode));
 }
 
