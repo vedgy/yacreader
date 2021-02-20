@@ -314,11 +314,11 @@ QString FolderModel::getDatabase()
     return _databasePath;
 }
 
-QString FolderModel::getFolderPath(const QModelIndex &folder)
+QString FolderModel::getFolderPath(const QModelIndex &folder) const
 {
     if (!folder.isValid()) //root folder
         return "/";
-    return static_cast<FolderItem *>(folder.internalPointer())->data(FolderModel::Path).toString();
+    return static_cast<const FolderItem *>(folder.internalPointer())->data(FolderModel::Path).toString();
 }
 
 void FolderModel::updateFolderCompletedStatus(const QModelIndexList &list, bool status)

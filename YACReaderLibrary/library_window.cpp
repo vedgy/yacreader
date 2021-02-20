@@ -1379,9 +1379,8 @@ void LibraryWindow::copyAndImportComicsToFolder(const QList<QPair<QString, QStri
 {
     QLOG_DEBUG() << "-copyAndImportComicsToFolder-";
     if (comics.size() > 0) {
-        QModelIndex folderDestination = foldersModelProxy->mapToSource(miFolder);
-
-        QString destFolderPath = QDir::cleanPath(currentPath() + foldersModel->getFolderPath(folderDestination));
+        const QModelIndex folderDestination = foldersModelProxy->mapToSource(miFolder);
+        const QString destFolderPath = absoluteFolderPath(folderDestination);
 
         QLOG_DEBUG() << "Coping to " << destFolderPath;
 
@@ -1398,9 +1397,8 @@ void LibraryWindow::moveAndImportComicsToFolder(const QList<QPair<QString, QStri
 {
     QLOG_DEBUG() << "-moveAndImportComicsToFolder-";
     if (comics.size() > 0) {
-        QModelIndex folderDestination = foldersModelProxy->mapToSource(miFolder);
-
-        QString destFolderPath = QDir::cleanPath(currentPath() + foldersModel->getFolderPath(folderDestination));
+        const QModelIndex folderDestination = foldersModelProxy->mapToSource(miFolder);
+        const QString destFolderPath = absoluteFolderPath(folderDestination);
 
         QLOG_DEBUG() << "Moving to " << destFolderPath;
 
@@ -1457,7 +1455,7 @@ void LibraryWindow::updateFolder(const QModelIndex &miFolder)
     QString currentLibrary = selectedLibrary->currentText();
     QString path = libraries.getPath(currentLibrary);
     _lastAdded = currentLibrary;
-    libraryCreator->updateFolder(QDir::cleanPath(path), QDir::cleanPath(path + "/.yacreaderlibrary"), QDir::cleanPath(currentPath() + foldersModel->getFolderPath(miFolder)), miFolder);
+    libraryCreator->updateFolder(QDir::cleanPath(path), QDir::cleanPath(path + "/.yacreaderlibrary"), absoluteFolderPath(miFolder), miFolder);
     libraryCreator->start();
 }
 
@@ -1522,7 +1520,7 @@ void LibraryWindow::addFolderToCurrentIndex()
     bool isValid = !newFolderName.contains(invalidChars);
 
     if (ok && !newFolderName.isEmpty() && isValid) {
-        QString parentPath = QDir::cleanPath(currentPath() + foldersModel->getFolderPath(currentIndex));
+        QString parentPath = absoluteFolderPath(currentIndex);
         QDir parentDir(parentPath);
         QDir newFolder(parentPath + "/" + newFolderName);
         if (parentDir.mkdir(newFolderName) || newFolder.exists()) {
@@ -2413,6 +2411,11 @@ void LibraryWindow::reloadOptions()
 QString LibraryWindow::currentPath() const
 {
     return libraries.getPath(selectedLibrary->currentText());
+}
+
+QString LibraryWindow::absoluteFolderPath(const QModelIndex &sourceIndex) const
+{
+    return QDir::cleanPath(currentPath() + foldersModel->getFolderPath(sourceIndex));
 }
 
 QString LibraryWindow::currentFolderPath()

@@ -283,6 +283,7 @@ public:
     //void enableLibraryActions();
 
     QString currentPath() const;
+    QString absoluteFolderPath(const QModelIndex &sourceIndex) const;
     QString currentFolderPath();
 
     //settings

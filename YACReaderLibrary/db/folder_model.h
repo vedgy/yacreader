@@ -60,7 +60,7 @@ public:
     //Convenience methods
     void setupModelData(QString path);
     QString getDatabase();
-    QString getFolderPath(const QModelIndex &folder);
+    QString getFolderPath(const QModelIndex &folder) const;
     //QModelIndex indexFromItem(FolderItem * item, int column);
 
     //bool isFilterEnabled(){return filterEnabled;};
