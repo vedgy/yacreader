@@ -35,7 +35,7 @@ void YACReaderLibraryListWidget::addItem(QString name, QString path)
     mainLayout->insertWidget(i, library);
 }
 
-QString YACReaderLibraryListWidget::currentText()
+QString YACReaderLibraryListWidget::currentText() const
 {
     return librariesList.at(currentLibraryIndex)->name;
 }

@@ -12,11 +12,12 @@ class YACReaderLibraryListWidget : public QWidget
 public:
     explicit YACReaderLibraryListWidget(QWidget *parent = 0);
 
+    QString currentText() const;
+
 signals:
     void currentIndexChanged(QString text);
 
 public slots:
-    QString currentText();
     int findText(QString text);
     void setCurrentIndex(int index);
     void addItem(QString name, QString path);

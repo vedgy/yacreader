@@ -282,7 +282,7 @@ public:
     //void enableActions();
     //void enableLibraryActions();
 
-    QString currentPath();
+    QString currentPath() const;
     QString currentFolderPath();
 
     //settings

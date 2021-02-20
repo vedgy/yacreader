@@ -16,7 +16,7 @@ QList<QString> YACReaderLibraries::getNames()
     return libraries.keys();
 }
 
-QString YACReaderLibraries::getPath(const QString &name)
+QString YACReaderLibraries::getPath(const QString &name) const
 {
     return libraries.value(name).second;
 }

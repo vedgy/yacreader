@@ -2410,7 +2410,7 @@ void LibraryWindow::reloadOptions()
     trayIconController->updateIconVisibility();
 }
 
-QString LibraryWindow::currentPath()
+QString LibraryWindow::currentPath() const
 {
     return libraries.getPath(selectedLibrary->currentText());
 }

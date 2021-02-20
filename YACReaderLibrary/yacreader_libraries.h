@@ -11,7 +11,7 @@ public:
     YACReaderLibraries();
     YACReaderLibraries(const YACReaderLibraries &source);
     QList<QString> getNames();
-    QString getPath(const QString &name);
+    QString getPath(const QString &name) const;
     QString getPath(int id);
     QString getName(int id);
     bool isEmpty();
