@@ -19,6 +19,11 @@ void ComicsView::setModel(ComicModel *m)
     model = m;
 }
 
+void ComicsView::enableDrops(bool enabled)
+{
+    setAcceptDrops(enabled);
+}
+
 void ComicsView::updateInfoForIndex(int index)
 {
     QQmlContext *ctxt = view->rootContext();

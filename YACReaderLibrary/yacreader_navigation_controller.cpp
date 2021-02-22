@@ -64,6 +64,7 @@ void YACReaderNavigationController::loadFolderInfo(const QModelIndex &modelIndex
     if (libraryWindow->comicsModel->rowCount() > 0) {
         //updateView
         comicsViewsManager->comicsView->setModel(libraryWindow->comicsModel);
+        comicsViewsManager->comicsView->enableDrops(true);
         comicsViewsManager->showComicsView();
         libraryWindow->disableComicsActions(false);
     } else {
@@ -93,7 +94,12 @@ void YACReaderNavigationController::loadListInfo(const QModelIndex &modelIndex)
     case ReadingListModel::ReadingList:
         loadReadingListInfo(modelIndex);
         break;
+
+    case ReadingListModel::Separator:
+        Q_ASSERT(false);
     }
+    // Dropping into reading lists is not supported.
+    comicsViewsManager->comicsView->enableDrops(false);
 
     //if a list is selected, foldersView selection must be cleared
     libraryWindow->foldersView->clearSelection();

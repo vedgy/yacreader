@@ -29,6 +29,7 @@ public:
     void toFullScreen() override;
     void toNormal() override;
     void updateConfig(QSettings *settings) override;
+    void enableDrops(bool enabled) override;
     void enableFilterMode(bool enabled) override;
     void selectIndex(int index) override;
     void updateCurrentComicView() override;

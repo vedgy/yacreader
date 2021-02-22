@@ -26,6 +26,7 @@ public:
     virtual void toFullScreen() = 0;
     virtual void toNormal() = 0;
     virtual void updateConfig(QSettings *settings) = 0;
+    virtual void enableDrops(bool enabled);
     virtual void enableFilterMode(bool enabled) = 0;
     virtual void selectIndex(int index) = 0;
     virtual void updateCurrentComicView() = 0;

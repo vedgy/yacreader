@@ -101,6 +101,10 @@ Rectangle {
         anchors.fill: parent
 
         onEntered: {
+            if (!dropManager.acceptDrops) {
+                drag.accepted = false;
+                return;
+            }
             if(drag.hasUrls)
             {
                 if(dropManager.canDropUrls(drag.urls, drag.action))

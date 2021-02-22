@@ -1346,6 +1346,7 @@ void LibraryWindow::loadCoversFromCurrentModel()
 void LibraryWindow::copyAndImportComicsToCurrentFolder(const QList<QPair<QString, QString>> &comics)
 {
     QLOG_DEBUG() << "-copyAndImportComicsToCurrentFolder-";
+    Q_ASSERT(currentSourceType() == YACReaderLibrarySourceContainer::Folder);
     if (comics.size() > 0) {
         const QModelIndex folderDestination = getCurrentFolderIndex();
         const QString destFolderPath = absoluteFolderPath(folderDestination);
@@ -1362,6 +1363,7 @@ void LibraryWindow::copyAndImportComicsToCurrentFolder(const QList<QPair<QString
 void LibraryWindow::moveAndImportComicsToCurrentFolder(const QList<QPair<QString, QString>> &comics)
 {
     QLOG_DEBUG() << "-moveAndImportComicsToCurrentFolder-";
+    Q_ASSERT(currentSourceType() == YACReaderLibrarySourceContainer::Folder);
     if (comics.size() > 0) {
         const QModelIndex folderDestination = getCurrentFolderIndex();
         const QString destFolderPath = absoluteFolderPath(folderDestination);
@@ -2209,6 +2211,7 @@ void LibraryWindow::setComicSearchFilterData(QList<ComicItem *> *data, const QSt
     status = LibraryWindow::Searching;
 
     comicsModel->setModelData(data, databasePath);
+    comicsViewsManager->comicsView->enableDrops(false); // There is no logical drop destination in search mode.
     comicsViewsManager->comicsView->enableFilterMode(true);
     comicsViewsManager->comicsView->setModel(comicsModel); //TODO, columns are messed up after ResetModel some times, this shouldn't be necesary
 

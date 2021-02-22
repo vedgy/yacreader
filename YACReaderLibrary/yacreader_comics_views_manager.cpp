@@ -176,6 +176,7 @@ void YACReaderComicsViewsManager::switchToComicsView(ComicsView *from, ComicsVie
     //load content into current view
     libraryWindow->loadCoversFromCurrentModel();
 
+    comicsView->enableDrops(from->acceptDrops()); // Keep current drag&drop behavior.
     if (!libraryWindow->searchEdit->text().isEmpty()) {
         comicsView->enableFilterMode(true);
     }

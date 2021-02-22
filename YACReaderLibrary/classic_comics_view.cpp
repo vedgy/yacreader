@@ -231,6 +231,12 @@ void ClassicComicsView::updateConfig(QSettings *settings)
     comicFlow->updateConfig(settings);
 }
 
+void ClassicComicsView::enableDrops(bool enabled)
+{
+    ComicsView::enableDrops(enabled);
+    tableView->setAcceptDrops(enabled);
+}
+
 void ClassicComicsView::enableFilterMode(bool enabled)
 {
     if (enabled) {
