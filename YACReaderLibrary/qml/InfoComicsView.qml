@@ -108,7 +108,8 @@ Rectangle {
                     drag.accepted = true;
                 }else
                     drag.accepted = false;
-            }
+            } else
+                drag.accepted = false;
         }
 
         onDropped: {
