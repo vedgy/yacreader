@@ -1639,7 +1639,15 @@ void LibraryWindow::deleteSelectedReadingList()
             int ret = QMessageBox::question(this, tr("Delete list/label"), tr("The selected item will be deleted, your comics or folders will NOT be deleted from your disk. Are you sure?"), QMessageBox::Yes, QMessageBox::No);
             if (ret == QMessageBox::Yes) {
                 listsModel->deleteItem(mi);
-                navigationController->reselectCurrentList();
+                if (status == LibraryWindow::Searching) {
+                    // Update history with the current valid index but remain in search mode.
+                    const auto index = listsModelProxy->mapToSource(listsView->currentIndex());
+                    historyController->updateHistory(
+                            YACReaderLibrarySourceContainer(index, YACReaderLibrarySourceContainer::List));
+                    setToolbarTitle(index);
+                } else {
+                    navigationController->reselectCurrentList();
+                }
             }
         }
     }
