@@ -391,20 +391,18 @@ void ReadingListModel::addReadingList(const QString &name)
     QString connectionName = "";
     {
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
-        beginInsertRows(QModelIndex(), 0, 0); //TODO calculate the right coordinates before inserting
+        const auto id = DBHelper::insertReadingList(name, db);
 
-        qulonglong id = DBHelper::insertReadingList(name, db);
-        ReadingListItem *newItem;
-        rootItem->insertChild(newItem = new ReadingListItem(QList<QVariant>()
-                                                            << name
-                                                            << id
-                                                            << false
-                                                            << true
-                                                            << 0));
+        const auto newItem = new ReadingListItem({ name, id, false, true, 0 });
+        const int insertionPosition = rootItem->insertionPosition(newItem);
 
+        constexpr int separatorsCount { 2 };
+        const int modelRow = specialLists.size() + labels.size() + separatorsCount + insertionPosition;
+        beginInsertRows(QModelIndex(), modelRow, modelRow);
+        rootItem->insertChild(newItem, insertionPosition);
         items.insert(id, newItem);
-
         endInsertRows();
+
         connectionName = db.connectionName();
     }
     QSqlDatabase::removeDatabase(connectionName);
@@ -414,23 +412,21 @@ void ReadingListModel::addReadingListAt(const QString &name, const QModelIndex &
 {
     QString connectionName = "";
     {
+        const auto readingListParent = static_cast<ReadingListItem *>(mi.internalPointer());
+        const auto ordering = readingListParent->childCount();
+
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
+        const auto id = DBHelper::insertReadingSubList(name, mi.data(IDRole).toULongLong(), ordering, db);
 
-        beginInsertRows(mi, 0, 0); //TODO calculate the right coordinates before inserting
+        const auto newItem = new ReadingListItem({ name, id, false, true, ordering });
+        Q_ASSERT(readingListParent->insertionPosition(newItem) == ordering);
 
-        auto readingListParent = static_cast<ReadingListItem *>(mi.internalPointer());
-        qulonglong id = DBHelper::insertReadingSubList(name, mi.data(IDRole).toULongLong(), readingListParent->childCount(), db);
-        ReadingListItem *newItem;
-
-        readingListParent->insertChild(newItem = new ReadingListItem(QList<QVariant>()
-                                                                     << name
-                                                                     << id
-                                                                     << false
-                                                                     << true
-                                                                     << readingListParent->childCount()));
-
+        const int modelRow = ordering;
+        beginInsertRows(mi, modelRow, modelRow);
+        readingListParent->insertChild(newItem, ordering);
         items.insert(id, newItem);
         endInsertRows();
+
         connectionName = db.connectionName();
     }
     QSqlDatabase::removeDatabase(connectionName);

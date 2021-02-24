@@ -69,6 +69,8 @@ public:
     int row() const;
     ReadingListItem *child(int row);
     void insertChild(ReadingListItem *item);
+    //! @return The position at which insertChild(item) would insert @p item.
+    int insertionPosition(const ReadingListItem *item) const;
     void insertChild(ReadingListItem *item, int pos);
     void removeChild(ReadingListItem *item);
     qulonglong getId() const override;

@@ -144,47 +144,31 @@ ReadingListItem *ReadingListItem::child(int row)
     return childItems.at(row);
 }
 
-//items are sorted by order
 void ReadingListItem::insertChild(ReadingListItem *item)
 {
-    item->parent = this;
+    insertChild(item, insertionPosition(item));
+}
 
-    if (childItems.isEmpty())
-        childItems.append(item);
-    else {
-        if (item->parent->getId() == 0) //sort by name, top level child
-        {
-            int i = 0;
-            while (i < childItems.length() && naturalSortLessThanCI(childItems.at(i)->name(), item->name()))
-                i++;
-            childItems.insert(i, item);
-        } else {
-            int i = 0;
-            while (i < childItems.length() && (childItems.at(i)->getOrdering() < item->getOrdering()))
-                i++;
-            childItems.insert(i, item);
-        }
-
-        /*ReadingListItem * last = childItems.back();
-        QString nameLast = last->data(1).toString(); //TODO usar info name si est� disponible, sino el nombre del fichero.....
-        QString nameCurrent = item->data(1).toString();
-        QList<FolderItem *>::iterator i;
-        i = childItems.end();
-        i--;
-        while (naturalSortLessThanCI(nameCurrent,nameLast) && i != childItems.begin())
-        {
-            i--;
-            nameLast = (*i)->data(1).toString();
-        }
-        if(!naturalSortLessThanCI(nameCurrent,nameLast)) //si se ha encontrado un elemento menor que current, se inserta justo despu�s
-            childItems.insert(++i,item);
-        else
-            childItems.insert(i,item);*/
+//items are sorted by order
+int ReadingListItem::insertionPosition(const ReadingListItem *item) const
+{
+    if (getId() == 0) //sort by name, top level child
+    {
+        int i = 0;
+        while (i < childItems.length() && naturalSortLessThanCI(childItems.at(i)->name(), item->name()))
+            i++;
+        return i;
+    } else {
+        int i = 0;
+        while (i < childItems.length() && (childItems.at(i)->getOrdering() < item->getOrdering()))
+            i++;
+        return i;
     }
 }
 
 void ReadingListItem::insertChild(ReadingListItem *item, int pos)
 {
+    item->parent = this;
     childItems.insert(pos, item);
 }
 
