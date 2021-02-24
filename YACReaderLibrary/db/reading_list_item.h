@@ -68,8 +68,8 @@ public:
     int childCount() const;
     int row() const;
     ReadingListItem *child(int row);
-    void appendChild(ReadingListItem *item);
-    void appendChild(ReadingListItem *item, int pos);
+    void insertChild(ReadingListItem *item);
+    void insertChild(ReadingListItem *item, int pos);
     void removeChild(ReadingListItem *item);
     qulonglong getId() const override;
     QString name() const;

@@ -308,7 +308,7 @@ bool ReadingListModel::dropSublist(const QMimeData *data, Qt::DropAction action,
     auto parentItem = static_cast<ReadingListItem *>(destParent.internalPointer());
     ReadingListItem *child = parentItem->child(sourceRow);
     parentItem->removeChild(child);
-    parentItem->appendChild(child, destRow);
+    parentItem->insertChild(child, destRow);
 
     reorderingChildren(parentItem->children());
     //endMoveRows();
@@ -395,7 +395,7 @@ void ReadingListModel::addReadingList(const QString &name)
 
         qulonglong id = DBHelper::insertReadingList(name, db);
         ReadingListItem *newItem;
-        rootItem->appendChild(newItem = new ReadingListItem(QList<QVariant>()
+        rootItem->insertChild(newItem = new ReadingListItem(QList<QVariant>()
                                                             << name
                                                             << id
                                                             << false
@@ -422,7 +422,7 @@ void ReadingListModel::addReadingListAt(const QString &name, const QModelIndex &
         qulonglong id = DBHelper::insertReadingSubList(name, mi.data(IDRole).toULongLong(), readingListParent->childCount(), db);
         ReadingListItem *newItem;
 
-        readingListParent->appendChild(newItem = new ReadingListItem(QList<QVariant>()
+        readingListParent->insertChild(newItem = new ReadingListItem(QList<QVariant>()
                                                                      << name
                                                                      << id
                                                                      << false
@@ -586,7 +586,7 @@ void ReadingListModel::setupReadingListsData(QSqlQuery &sqlquery, ReadingListIte
         else
             currentParent = items.value(sqlquery.value(parentId).toULongLong());
 
-        currentParent->appendChild(rli);
+        currentParent->insertChild(rli);
 
         items.insert(rli->getId(), rli);
     }

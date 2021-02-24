@@ -145,7 +145,7 @@ ReadingListItem *ReadingListItem::child(int row)
 }
 
 //items are sorted by order
-void ReadingListItem::appendChild(ReadingListItem *item)
+void ReadingListItem::insertChild(ReadingListItem *item)
 {
     item->parent = this;
 
@@ -183,7 +183,7 @@ void ReadingListItem::appendChild(ReadingListItem *item)
     }
 }
 
-void ReadingListItem::appendChild(ReadingListItem *item, int pos)
+void ReadingListItem::insertChild(ReadingListItem *item, int pos)
 {
     childItems.insert(pos, item);
 }
