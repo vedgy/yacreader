@@ -14,7 +14,7 @@ FolderItem::~FolderItem()
     qDeleteAll(childItems);
 }
 
-void FolderItem::appendChild(FolderItem *item)
+void FolderItem::insertChild(FolderItem *item)
 {
     item->parentItem = this;
 

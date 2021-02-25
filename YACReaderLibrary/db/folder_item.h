@@ -51,7 +51,7 @@ public:
     FolderItem(const QList<QVariant> &data, FolderItem *parent = nullptr);
     ~FolderItem();
 
-    void appendChild(FolderItem *child);
+    void insertChild(FolderItem *child);
 
     FolderItem *child(int row);
     int childCount() const;

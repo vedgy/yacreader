@@ -269,7 +269,7 @@ void FolderModel::setupModelData(QSqlQuery &sqlquery, FolderItem *parent)
         //la inserci�n de hijos se hace de forma ordenada
         FolderItem *parent = items.value(sqlquery.value(parentId).toULongLong());
         //if(parent !=0) //TODO if parent==0 the parent of item was removed from the DB and delete on cascade didn't work, ERROR.
-        parent->appendChild(item);
+        parent->insertChild(item);
         //se a�ade el item al map, de forma que se pueda encontrar como padre en siguientes iteraciones
         items.insert(item->id, item);
     }
@@ -303,7 +303,7 @@ void FolderModel::updateFolderModelData(QSqlQuery &sqlquery, FolderItem *parent)
         //la inserci�n de hijos se hace de forma ordenada
         FolderItem *parent = items.value(sqlquery.value(parentId).toULongLong());
         if (parent != 0) //TODO if parent==0 the parent of item was removed from the DB and delete on cascade didn't work, ERROR.
-            parent->appendChild(item);
+            parent->insertChild(item);
         //se a�ade el item al map, de forma que se pueda encontrar como padre en siguientes iteraciones
         items.insert(item->id, item);
     }
@@ -524,7 +524,7 @@ QModelIndex FolderModel::addFolderAtParent(const QString &folderName, const QMod
 
     beginInsertRows(parent, 0, 0); //TODO calculate the destRow before inserting the new child
 
-    parentItem->appendChild(item);
+    parentItem->insertChild(item);
     destRow = parentItem->children().indexOf(item); //TODO optimize this, appendChild should return the index of the new item
     items.insert(item->id, item);
 

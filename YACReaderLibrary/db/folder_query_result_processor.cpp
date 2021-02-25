@@ -132,7 +132,7 @@ void YACReader::FolderQueryResultProcessor::setupFilteredModelData(QSqlQuery &sq
 
         //si el padre ya existe en el modelo, el item se a�ade como hijo
         if (filteredItems->contains(parentId))
-            filteredItems->value(parentId)->appendChild(item);
+            filteredItems->value(parentId)->insertChild(item);
         else //si el padre a�n no se ha a�adido, hay que a�adirlo a �l y todos los padres hasta el nodo ra�z
         {
             //comprobamos con esta variable si el �ltimo de los padres (antes del nodo ra�z) ya exist�a en el modelo
@@ -150,12 +150,12 @@ void YACReader::FolderQueryResultProcessor::setupFilteredModelData(QSqlQuery &sq
 
                 //si el modelo contiene al padre, se a�ade el item actual como hijo
                 if (filteredItems->contains(parentId)) {
-                    filteredItems->value(parentId)->appendChild(item);
+                    filteredItems->value(parentId)->insertChild(item);
                     parentPreviousInserted = true;
                 }
                 //sino se registra el nodo para poder encontrarlo con posterioridad y se a�ade el item actual como hijo
                 else {
-                    newparentItem->appendChild(item);
+                    newparentItem->insertChild(item);
                     filteredItems->insert(newparentItem->id, newparentItem);
                     parentPreviousInserted = false;
                 }
@@ -167,7 +167,7 @@ void YACReader::FolderQueryResultProcessor::setupFilteredModelData(QSqlQuery &sq
 
             //si el nodo es hijo de 1 y no hab�a sido previamente insertado como hijo, se a�ade como tal
             if (!parentPreviousInserted) {
-                filteredItems->value(ROOT)->appendChild(item);
+                filteredItems->value(ROOT)->insertChild(item);
             } else {
                 delete item;
             }
