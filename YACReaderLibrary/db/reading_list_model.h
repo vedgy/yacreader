@@ -86,7 +86,10 @@ private:
     QList<SpecialListItem *> setupSpecialLists(QSqlDatabase &db);
     void setupLabels(QSqlDatabase &db);
     void setupReadingLists(QSqlDatabase &db);
-    int insertLabelIntoList(LabelItem *item);
+    void insertLabelIntoList(LabelItem *item);
+    //! @return The position at which insertLabelIntoList(item) would insert @p item.
+    int labelInsertionPosition(const LabelItem *item) const;
+    void insertLabelIntoList(LabelItem *item, int pos);
     void reorderingChildren(QList<ReadingListItem *> children);
 
     bool rowIsSpecialList(int row, const QModelIndex &parent = QModelIndex()) const;

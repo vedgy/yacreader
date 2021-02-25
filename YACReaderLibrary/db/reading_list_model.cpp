@@ -377,10 +377,15 @@ void ReadingListModel::addNewLabel(const QString &name, YACReader::LabelColors c
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
         qulonglong id = DBHelper::insertLabel(name, color, db);
 
-        int newPos = insertLabelIntoList(new LabelItem(QList<QVariant>() << name << YACReader::colorToName(color) << id << color));
-        beginInsertRows(QModelIndex(), specialLists.count() + 1 + newPos + 1, specialLists.count() + 1 + newPos + 1);
+        const auto newItem = new LabelItem({ name, YACReader::colorToName(color), id, color });
+        const int insertionPosition = labelInsertionPosition(newItem);
 
+        constexpr int separatorsBeforeLabels { 1 };
+        const int modelRow = specialLists.size() + separatorsBeforeLabels + insertionPosition;
+        beginInsertRows(QModelIndex(), modelRow, modelRow);
+        insertLabelIntoList(newItem, insertionPosition);
         endInsertRows();
+
         connectionName = db.connectionName();
     }
     QSqlDatabase::removeDatabase(connectionName);
@@ -664,36 +669,26 @@ void ReadingListModel::setupReadingLists(QSqlDatabase &db)
     //    node1->appendChild(new ReadingListItem(QList<QVariant>() /*<< 0*/ << "sublist" << "atr",node1));
 }
 
-int ReadingListModel::insertLabelIntoList(LabelItem *item)
+void ReadingListModel::insertLabelIntoList(LabelItem *item)
 {
-    if (labels.isEmpty())
-        labels << item;
-    else {
-        int i = 0;
+    insertLabelIntoList(item, labelInsertionPosition(item));
+}
 
-        while (i < labels.count() && (labels.at(i)->colorid() < item->colorid()))
-            i++;
+int ReadingListModel::labelInsertionPosition(const LabelItem *item) const
+{
+    int i = 0;
+    const auto itemColor = item->colorid();
+    while (i < labels.count() && labels.at(i)->colorid() < itemColor)
+        ++i;
+    while (i < labels.count() && labels.at(i)->colorid() == itemColor && naturalSortLessThanCI(labels.at(i)->name(), item->name()))
+        ++i;
+    return i;
+}
 
-        if (i < labels.count()) {
-            if (labels.at(i)->colorid() == item->colorid()) //sort by name
-            {
-                while (i < labels.count() && labels.at(i)->colorid() == item->colorid() && naturalSortLessThanCI(labels.at(i)->name(), item->name()))
-                    i++;
-            }
-        }
-
-        if (i >= labels.count()) {
-            QLOG_DEBUG() << "insertando label al final " << item->name();
-            labels << item;
-        } else {
-            QLOG_DEBUG() << "insertando label en  " << i << "-" << item->name();
-            labels.insert(i, item);
-        }
-
-        return i;
-    }
-
-    return 0;
+void ReadingListModel::insertLabelIntoList(LabelItem *item, int pos)
+{
+    QLOG_DEBUG() << "inserting label" << item->name() << "at" << pos;
+    labels.insert(pos, item);
 }
 
 void ReadingListModel::reorderingChildren(QList<ReadingListItem *> children)
