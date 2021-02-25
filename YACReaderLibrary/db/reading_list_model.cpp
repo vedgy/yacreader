@@ -377,7 +377,7 @@ void ReadingListModel::addNewLabel(const QString &name, YACReader::LabelColors c
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
         qulonglong id = DBHelper::insertLabel(name, color, db);
 
-        int newPos = addLabelIntoList(new LabelItem(QList<QVariant>() << name << YACReader::colorToName(color) << id << color));
+        int newPos = insertLabelIntoList(new LabelItem(QList<QVariant>() << name << YACReader::colorToName(color) << id << color));
         beginInsertRows(QModelIndex(), specialLists.count() + 1 + newPos + 1, specialLists.count() + 1 + newPos + 1);
 
         endInsertRows();
@@ -623,11 +623,11 @@ void ReadingListModel::setupLabels(QSqlDatabase &db)
     int ordering = record.indexOf("ordering");
 
     while (selectQuery.next()) {
-        addLabelIntoList(new LabelItem(QList<QVariant>()
-                                       << selectQuery.value(name)
-                                       << selectQuery.value(color)
-                                       << selectQuery.value(id)
-                                       << selectQuery.value(ordering)));
+        insertLabelIntoList(new LabelItem(QList<QVariant>()
+                                          << selectQuery.value(name)
+                                          << selectQuery.value(color)
+                                          << selectQuery.value(id)
+                                          << selectQuery.value(ordering)));
     }
 
     //TEST
@@ -664,7 +664,7 @@ void ReadingListModel::setupReadingLists(QSqlDatabase &db)
     //    node1->appendChild(new ReadingListItem(QList<QVariant>() /*<< 0*/ << "sublist" << "atr",node1));
 }
 
-int ReadingListModel::addLabelIntoList(LabelItem *item)
+int ReadingListModel::insertLabelIntoList(LabelItem *item)
 {
     if (labels.isEmpty())
         labels << item;
