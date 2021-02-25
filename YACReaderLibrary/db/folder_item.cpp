@@ -1,4 +1,5 @@
 #include <QStringList>
+#include <algorithm>
 
 #include "folder_item.h"
 #include "qnaturalsorting.h"
@@ -16,28 +17,23 @@ FolderItem::~FolderItem()
 
 void FolderItem::insertChild(FolderItem *item)
 {
+    insertChild(item, insertionPosition(item));
+}
+
+int FolderItem::insertionPosition(const FolderItem *item) const
+{
+    const auto getItemName = [](const FolderItem *item) { return item->data(1).toString(); };
+    const auto it = std::upper_bound(childItems.cbegin(), childItems.cend(), getItemName(item),
+                                     [getItemName](const QString &name, const FolderItem *item) {
+                                         return naturalSortLessThanCI(name, getItemName(item));
+                                     });
+    return it - childItems.cbegin();
+}
+
+void FolderItem::insertChild(FolderItem *item, int pos)
+{
     item->parentItem = this;
-
-    if (childItems.isEmpty())
-        childItems.append(item);
-    else {
-        FolderItem *last = childItems.back();
-        QString nameLast = last->data(1).toString(); //TODO usar info name si est� disponible, sino el nombre del fichero.....
-        QString nameCurrent = item->data(1).toString();
-        QList<FolderItem *>::iterator i;
-        i = childItems.end();
-        i--;
-        while (naturalSortLessThanCI(nameCurrent, nameLast) && i != childItems.begin()) {
-            i--;
-            nameLast = (*i)->data(1).toString();
-        }
-        if (!naturalSortLessThanCI(nameCurrent, nameLast)) //si se ha encontrado un elemento menor que current, se inserta justo despu�s
-            childItems.insert(++i, item);
-        else
-            childItems.insert(i, item);
-    }
-
-    //childItems.append(item);
+    childItems.insert(pos, item);
 }
 
 FolderItem *FolderItem::child(int row)

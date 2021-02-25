@@ -51,7 +51,10 @@ public:
     FolderItem(const QList<QVariant> &data, FolderItem *parent = nullptr);
     ~FolderItem();
 
-    void insertChild(FolderItem *child);
+    void insertChild(FolderItem *item);
+    //! @return The position at which insertChild(item) would insert @p item.
+    int insertionPosition(const FolderItem *item) const;
+    void insertChild(FolderItem *item, int pos);
 
     FolderItem *child(int row);
     int childCount() const;

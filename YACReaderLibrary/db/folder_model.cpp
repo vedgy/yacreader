@@ -510,8 +510,6 @@ QModelIndex FolderModel::addFolderAtParent(const QString &folderName, const QMod
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    int destRow = 0;
-
     QList<QVariant> data;
     data << newFolder.name;
     data << newFolder.path;
@@ -521,16 +519,15 @@ QModelIndex FolderModel::addFolderAtParent(const QString &folderName, const QMod
 
     auto item = new FolderItem(data);
     item->id = newFolder.id;
+    const int insertionPosition = parentItem->insertionPosition(item);
 
-    beginInsertRows(parent, 0, 0); //TODO calculate the destRow before inserting the new child
-
-    parentItem->insertChild(item);
-    destRow = parentItem->children().indexOf(item); //TODO optimize this, appendChild should return the index of the new item
+    const int modelRow = insertionPosition;
+    beginInsertRows(parent, modelRow, modelRow);
+    parentItem->insertChild(item, insertionPosition);
     items.insert(item->id, item);
-
     endInsertRows();
 
-    return index(destRow, 0, parent);
+    return index(modelRow, 0, parent);
 }
 
 void FolderModel::deleteFolder(const QModelIndex &mi)
