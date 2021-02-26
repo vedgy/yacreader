@@ -1838,16 +1838,24 @@ void LibraryWindow::selectSubfolder(const QModelIndex &mi, int child)
 //TODO broken window :)
 void LibraryWindow::checkEmptyFolder()
 {
-    if (comicsModel->rowCount() > 0 && !importedCovers) {
+    const bool emptyView = comicsModel->rowCount() == 0;
+    if (!emptyView && !importedCovers) {
         disableComicsActions(false);
     } else {
         disableComicsActions(true);
 #ifndef Q_OS_MAC
-        if (comicsModel->rowCount() > 0)
+        if (!emptyView)
             toggleFullScreenAction->setEnabled(true);
 #endif
-        if (comicsModel->rowCount() == 0)
+        if (emptyView)
             reloadComicsView();
+    }
+
+    if (!emptyView && status == LibraryWindow::Searching) {
+        // Update foldersModelProxy in case some directories should no longer be displayed after
+        // a comic deletion. When emptyView is true, reloadComicsView() takes care of this.
+        Q_ASSERT(!lastSearchFilter.isEmpty());
+        folderQueryResultProcessor->createModelData(lastSearchModifiers, lastSearchFilter, true);
     }
 }
 
