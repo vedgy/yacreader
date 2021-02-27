@@ -1470,11 +1470,26 @@ QProgressDialog *LibraryWindow::newProgressDialog(const QString &label, int maxV
 
 void LibraryWindow::reloadAfterCopyMove(const QModelIndex &mi)
 {
-    if (getCurrentFolderIndex() == mi) {
-        navigationController->loadFolderInfo(mi);
-    }
-
     foldersModel->fetchMoreFromDB(mi);
+
+    const bool replacedCurrentSource = !historyController->validateCurrentSourceContainer();
+
+    if (status == LibraryWindow::Searching) {
+        // The current search results may be affected by the update => refresh them.
+        setSearchFilter(lastSearchModifiers, lastSearchFilter);
+        if (replacedCurrentSource)
+            setToolbarTitle(currentSourceModelIndex());
+    } else {
+        const auto source = historyController->currentSourceContainer();
+        if (replacedCurrentSource) {
+            // The current source is now the root => update the UI accordingly.
+            navigationController->loadIndexFromHistory(source, YACReaderNavigationController::LoadScope::ComicsViewAndSideBar);
+            setToolbarTitle(source.getSourceModelIndex());
+        } else {
+            // The current ComicsView may be affected by the update => refresh it.
+            navigationController->loadIndexFromHistory(source, YACReaderNavigationController::LoadScope::ComicsView);
+        }
+    }
 
     enableNeededActions();
 }

@@ -4,6 +4,7 @@
 #include <QObject>
 
 #include <QModelIndex>
+#include <QPersistentModelIndex>
 
 class YACReaderHistoryController;
 
@@ -21,12 +22,18 @@ public:
     QModelIndex getSourceModelIndex() const;
     YACReaderLibrarySourceContainer::SourceType getType() const;
 
+    //! The destructor and the comparison operators are the only member functions
+    //! that may be called if *this has been invalidated and no longer exists.
+
     bool operator==(const YACReaderLibrarySourceContainer &other) const;
     bool operator!=(const YACReaderLibrarySourceContainer &other) const;
 
-protected:
-    QModelIndex sourceModelIndex;
+private:
+    bool stillExists() const;
+
+    QPersistentModelIndex sourceModelIndex;
     YACReaderLibrarySourceContainer::SourceType type;
+    bool isRootIndex;
 
     friend class YACReaderHistoryController;
 };
@@ -38,6 +45,10 @@ class YACReaderHistoryController : public QObject
     Q_OBJECT
 public:
     explicit YACReaderHistoryController(QObject *parent = nullptr);
+
+    //! If the current source container still exists, returns true; otherwise replaces
+    //! the no longer existing current source with the root index/source and returns false.
+    bool validateCurrentSourceContainer();
 
 signals:
     void enabledForward(bool enabled);
@@ -51,7 +62,16 @@ public slots:
     void updateHistory(const YACReaderLibrarySourceContainer &source);
     YACReaderLibrarySourceContainer currentSourceContainer();
 
-protected:
+private:
+    struct ExistsAndNotEqualToCurrent;
+
+    //! Removes nonexistent sources and "consecutive" existent duplicates between
+    //! currentFolderNavigation and the nearest existent different source before it.
+    void validateBackward();
+    //! Removes nonexistent sources and "consecutive" existent duplicates between
+    //! currentFolderNavigation and the nearest existent different source after it.
+    void validateForward();
+
     int currentFolderNavigation;
     QList<YACReaderLibrarySourceContainer> history;
 };
