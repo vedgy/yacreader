@@ -695,13 +695,14 @@ void Render::createComic(const QString &path)
     pagesEmited.clear();
 
     if (comic != nullptr) {
-        //comic->moveToThread(QApplication::instance()->thread());
         comic->invalidate();
-
+        // Dispatch pending events to guard against race conditons
+        // This needs to run before disconnect to clear queued signals
+        // while comic still is valid
+        QCoreApplication::sendPostedEvents(this);
         comic->disconnect();
         comic->deleteLater();
     }
-    //comic->moveToThread(QApplication::instance()->thread());
     comic = FactoryComic::newComic(path);
 
     if (comic == nullptr) //archivo no encontrado o no válido
