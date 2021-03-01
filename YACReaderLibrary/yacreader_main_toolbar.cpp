@@ -104,7 +104,7 @@ void YACReaderMainToolBar::resizeEvent(QResizeEvent *event)
     currentFolder->adjustSize();
 
     QFontMetrics metrix(currentFolder->font());
-    QString clippedText = metrix.elidedText(currentFolderName, Qt::ElideRight, maxLabelWidth);
+    QString clippedText = metrix.elidedText(_currentFolderName, Qt::ElideRight, maxLabelWidth);
 
     currentFolder->setText(clippedText);
     currentFolder->adjustSize();
@@ -132,7 +132,7 @@ void YACReaderMainToolBar::addWideDivider()
 void YACReaderMainToolBar::setCurrentFolderName(const QString &name)
 {
     currentFolder->setText(name);
-    currentFolderName = name;
+    _currentFolderName = name;
     currentFolder->adjustSize();
 
     int freeWidth = size().width() - 420;
@@ -140,7 +140,7 @@ void YACReaderMainToolBar::setCurrentFolderName(const QString &name)
     currentFolder->setMaximumWidth(maxLabelWidth);
 
     QFontMetrics metrix(currentFolder->font());
-    QString clippedText = metrix.elidedText(currentFolderName, Qt::ElideRight, maxLabelWidth);
+    QString clippedText = metrix.elidedText(_currentFolderName, Qt::ElideRight, maxLabelWidth);
 
     currentFolder->setText(clippedText);
     currentFolder->adjustSize();

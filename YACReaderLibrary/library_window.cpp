@@ -2077,7 +2077,7 @@ void LibraryWindow::renameLibrary()
 
 void LibraryWindow::rename(QString newName) //TODO replace
 {
-    QString currentLibrary = selectedLibrary->currentText();
+    const QString currentLibrary = selectedLibrary->currentText();
     if (newName != currentLibrary) {
         if (!libraries.contains(newName)) {
             libraries.rename(currentLibrary, newName);
@@ -2087,8 +2087,10 @@ void LibraryWindow::rename(QString newName) //TODO replace
             libraries.save();
             renameLibraryDialog->close();
 #ifndef Q_OS_MAC
-            if (!foldersModelProxy->mapToSource(foldersView->currentIndex()).isValid())
+            if (!currentSourceModelIndex().isValid()) {
+                Q_ASSERT(libraryToolBar->currentFolderName() == currentLibrary);
                 libraryToolBar->setCurrentFolderName(selectedLibrary->currentText());
+            }
 #endif
         } else {
             libraryAlreadyExists(newName);

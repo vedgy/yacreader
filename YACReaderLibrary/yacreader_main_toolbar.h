@@ -26,6 +26,7 @@ public:
     QToolButton *fullscreenButton;
 
     void setSearchWidget(QWidget *w);
+    QString currentFolderName() const { return _currentFolderName; }
     void setCurrentFolderName(const QString &name);
 signals:
 
@@ -38,7 +39,7 @@ private:
     QHBoxLayout *mainLayout;
 
     QLabel *currentFolder;
-    QString currentFolderName;
+    QString _currentFolderName;
 
     void addDivider();
     void addWideDivider();
