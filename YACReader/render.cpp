@@ -700,6 +700,7 @@ void Render::createComic(const QString &path)
         // This needs to run before disconnect to clear queued signals
         // while comic still is valid
         QCoreApplication::sendPostedEvents(this);
+        QThread::sleep(3);
         comic->disconnect();
         comic->deleteLater();
     }
@@ -859,8 +860,9 @@ bool Render::hasLoadedComic()
 
 void Render::setNumPages(unsigned int numPages)
 {
+    qCritical() << "Render::setNumPages(" << numPages << "); sender():" << sender() << "; comic:" << comic;
     if (sender() != comic) {
-        return;
+        qFatal("sender() != comic");
     }
     pagesReady.fill(false, numPages);
 }
