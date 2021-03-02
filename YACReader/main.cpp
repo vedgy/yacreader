@@ -98,6 +98,7 @@ int main(int argc, char *argv[])
 #else
     QApplication app(argc, argv);
 #endif
+    QCoreApplication::processEvents();
 
 #ifdef FORCE_ANGLE
     app.setAttribute(Qt::AA_UseOpenGLES);
