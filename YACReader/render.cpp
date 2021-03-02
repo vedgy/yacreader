@@ -700,7 +700,9 @@ void Render::createComic(const QString &path)
         // Dispatch pending events to guard against race conditons
         // This needs to run before disconnect to clear queued signals
         // while comic still is valid
+        inSendPostedEvents = true;
         QCoreApplication::sendPostedEvents(this);
+        inSendPostedEvents = false;
         // QThread::sleep(3);
         comic->deleteLater();
     }
@@ -861,7 +863,7 @@ bool Render::hasLoadedComic()
 void Render::setNumPages(unsigned int numPages)
 {
     qCritical() << "Render::setNumPages(" << numPages << "); sender():" << sender() << "; comic:" << comic;
-    if (sender() != comic) {
+    if (!inSendPostedEvents && sender() != comic) {
         qFatal("sender() != comic");
     }
     pagesReady.fill(false, numPages);

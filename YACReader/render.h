@@ -200,6 +200,7 @@ signals:
     void bookmarksUpdated();
 
 private:
+    bool inSendPostedEvents { false };
     Comic *comic;
     bool doublePage;
     bool doubleMangaPage;
