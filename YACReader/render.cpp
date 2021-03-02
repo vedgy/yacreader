@@ -703,7 +703,7 @@ void Render::createComic(const QString &path)
         inSendPostedEvents = true;
         QCoreApplication::sendPostedEvents(this);
         inSendPostedEvents = false;
-        // QThread::sleep(3);
+        QThread::sleep(3);
         comic->deleteLater();
     }
     comic = FactoryComic::newComic(path);
