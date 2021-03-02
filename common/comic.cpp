@@ -556,7 +556,7 @@ QList<QVector<quint32>> FileComic::getSections(int &sectionIndex)
 
 void FileComic::process()
 {
-    QThread::sleep(2);
+    // QThread::sleep(2);
     CompressedArchive archive(_path);
     if (!archive.toolsLoaded()) {
         moveToThread(QCoreApplication::instance()->thread());

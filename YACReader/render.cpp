@@ -701,7 +701,7 @@ void Render::createComic(const QString &path)
         // This needs to run before disconnect to clear queued signals
         // while comic still is valid
         QCoreApplication::sendPostedEvents(this);
-        QThread::sleep(3);
+        // QThread::sleep(3);
         comic->deleteLater();
     }
     comic = FactoryComic::newComic(path);
