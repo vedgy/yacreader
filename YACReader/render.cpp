@@ -696,7 +696,6 @@ void Render::createComic(const QString &path)
 
     if (comic != nullptr) {
         comic->invalidate();
-        comic->disconnect();
         // Dispatch pending events to guard against race conditons
         // This needs to run before disconnect to clear queued signals
         // while comic still is valid
@@ -704,6 +703,7 @@ void Render::createComic(const QString &path)
         QCoreApplication::sendPostedEvents(this);
         inSendPostedEvents = false;
         QThread::sleep(3);
+        comic->disconnect();
         comic->deleteLater();
     }
     comic = FactoryComic::newComic(path);
