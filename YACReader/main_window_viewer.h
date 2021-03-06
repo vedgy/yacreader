@@ -145,6 +145,8 @@ private:
 
     QAction *showEditShortcutsAction;
 
+    QList<QAction *> loadedComicActions;
+
     YACReaderSlider *zoomSliderAction;
 
     HttpVersionChecker *versionChecker;
@@ -158,6 +160,7 @@ private:
     void clearRecentFiles();
     void getSiblingComics(QString path, QString currentComic);
     void setActionsEnabled(bool enabled);
+    void setLoadedComicActionsEnabled(bool enabled);
 
     //! Manejadores de evento:
     //void resizeEvent(QResizeEvent * event);
