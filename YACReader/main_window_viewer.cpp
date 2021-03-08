@@ -175,6 +175,7 @@ void MainWindowViewer::setupUI()
     createActions();
     setUpShortcutsManagement();
     disableActions();
+    disablePreviousNextComicActions();
 
     createToolBars();
 
@@ -948,9 +949,12 @@ void MainWindowViewer::enableActions()
 void MainWindowViewer::disableActions()
 {
     setActionsEnabled(false);
-    for (auto *a : { setBookmarkAction,
-                     openComicOnTheLeftAction,
-                     openComicOnTheRightAction })
+    setBookmarkAction->setEnabled(false);
+}
+
+void MainWindowViewer::disablePreviousNextComicActions()
+{
+    for (auto *a : { openComicOnTheLeftAction, openComicOnTheRightAction })
         a->setEnabled(false);
 }
 
@@ -1114,17 +1118,9 @@ void MainWindowViewer::checkNewVersion()
 
 void MainWindowViewer::processReset()
 {
-    if (isClient) {
-        if (siblingComics.count() > 1) {
-            bool openNextB = openComicOnTheRightAction->isEnabled();
-            bool openPrevB = openComicOnTheLeftAction->isEnabled();
-            disableActions();
-            openComicOnTheRightAction->setEnabled(openNextB);
-            openComicOnTheLeftAction->setEnabled(openPrevB);
-        } else
-            disableActions();
-    } else
-        disableActions();
+    disableActions();
+    if (!isClient || siblingComics.size() <= 1)
+        disablePreviousNextComicActions();
 }
 
 void MainWindowViewer::setUpShortcutsManagement()

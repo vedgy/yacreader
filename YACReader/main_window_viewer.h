@@ -42,6 +42,7 @@ public slots:
     void showToolBars();
     void enableActions();
     void disableActions();
+    void disablePreviousNextComicActions();
     void toggleFullScreen();
     void toFullScreen();
     void toNormal();
