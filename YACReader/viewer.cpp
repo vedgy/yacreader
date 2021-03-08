@@ -36,7 +36,7 @@ Viewer::Viewer(QWidget *parent)
       numScrollSteps(22),
       shouldOpenNext(false),
       shouldOpenPrevious(false),
-      magnifyingGlassShowed(false),
+      magnifyingGlassShown(false),
       restoreMagnifyingGlass(false)
 {
     translator = new YACReaderTranslator(this);
@@ -712,7 +712,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     showCursor();
     hideCursorTimer->start(2500);
 
-    if (magnifyingGlassShowed)
+    if (magnifyingGlassShown)
         mglass->move(static_cast<int>(event->x() - float(mglass->width()) / 2), static_cast<int>(event->y() - float(mglass->height()) / 2));
 
     if (render->hasLoadedComic()) {
@@ -752,7 +752,7 @@ const QPixmap *Viewer::pixmap() const
 
 void Viewer::magnifyingGlassSwitch()
 {
-    magnifyingGlassShowed ? hideMagnifyingGlass() : showMagnifyingGlass();
+    magnifyingGlassShown ? hideMagnifyingGlass() : showMagnifyingGlass();
 }
 
 void Viewer::showMagnifyingGlass()
@@ -763,14 +763,14 @@ void Viewer::showMagnifyingGlass()
         mglass->move(static_cast<int>(p.x() - float(mglass->width()) / 2), static_cast<int>(p.y() - float(mglass->height()) / 2));
         mglass->show();
         mglass->updateImage(mglass->x() + mglass->width() / 2, mglass->y() + mglass->height() / 2);
-        magnifyingGlassShowed = true;
+        magnifyingGlassShown = true;
     }
 }
 
 void Viewer::hideMagnifyingGlass()
 {
     mglass->hide();
-    magnifyingGlassShowed = false;
+    magnifyingGlassShown = false;
 }
 
 void Viewer::informationSwitch()
@@ -925,7 +925,7 @@ void Viewer::resetContent()
 
 void Viewer::setLoadingMessage()
 {
-    if (magnifyingGlassShowed) {
+    if (magnifyingGlassShown) {
         hideMagnifyingGlass();
         restoreMagnifyingGlass = true;
     }
@@ -935,7 +935,7 @@ void Viewer::setLoadingMessage()
 
 void Viewer::setPageUnavailableMessage()
 {
-    if (magnifyingGlassShowed) {
+    if (magnifyingGlassShown) {
         hideMagnifyingGlass();
         restoreMagnifyingGlass = true;
     }
