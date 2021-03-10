@@ -745,7 +745,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-const QPixmap *Viewer::pixmap()
+const QPixmap *Viewer::pixmap() const
 {
     return content->pixmap();
 }
