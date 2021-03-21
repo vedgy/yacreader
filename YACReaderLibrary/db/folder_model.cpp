@@ -328,6 +328,7 @@ void FolderModel::updateFolderCompletedStatus(const QModelIndexList &list, bool 
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
         db.transaction();
         foreach (QModelIndex mi, list) {
+            Q_ASSERT(mi.isValid());
             auto item = static_cast<FolderItem *>(mi.internalPointer());
             item->setData(FolderModel::Completed, status);
 
@@ -350,6 +351,7 @@ void FolderModel::updateFolderFinishedStatus(const QModelIndexList &list, bool s
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
         db.transaction();
         foreach (QModelIndex mi, list) {
+            Q_ASSERT(mi.isValid());
             auto item = static_cast<FolderItem *>(mi.internalPointer());
             item->setData(FolderModel::Finished, status);
 
@@ -372,6 +374,7 @@ void FolderModel::updateFolderManga(const QModelIndexList &list, bool manga)
         QSqlDatabase db = DataBaseManagement::loadDatabase(_databasePath);
         db.transaction();
         foreach (QModelIndex mi, list) {
+            Q_ASSERT(mi.isValid());
             auto item = static_cast<FolderItem *>(mi.internalPointer());
 
             std::function<void(FolderItem *, bool)> setManga;

@@ -323,12 +323,9 @@ public slots:
     void updateLibrary();
     //void deleteLibrary();
     void openContainingFolder();
-    void setFolderAsNotCompleted();
-    void setFolderAsCompleted();
-    void setFolderAsRead();
-    void setFolderAsUnread();
-    void setFolderAsManga();
-    void setFolderAsNormal();
+    void setFolderCompleted(bool completed);
+    void setFolderRead(bool read);
+    void setFolderManga(bool manga);
     void openContainingFolderComic();
     void deleteCurrentLibrary();
     void removeLibrary();
@@ -423,6 +420,8 @@ private:
     //! @return The selected foldersModel's (source) folder index or an empty index
     //! if no folder is currently selected.
     QModelIndex getSelectedFolderIndex() const;
+
+    void showNoFolderSelectedMessage();
 
     YACReader::SearchModifiers lastSearchModifiers;
     QString lastSearchFilter;

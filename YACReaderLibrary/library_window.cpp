@@ -1134,13 +1134,14 @@ void LibraryWindow::createConnections()
 
     //ContextMenus
     connect(openContainingFolderComicAction, SIGNAL(triggered()), this, SLOT(openContainingFolderComic()));
-    connect(setFolderAsNotCompletedAction, SIGNAL(triggered()), this, SLOT(setFolderAsNotCompleted()));
-    connect(setFolderAsCompletedAction, SIGNAL(triggered()), this, SLOT(setFolderAsCompleted()));
-    connect(setFolderAsReadAction, SIGNAL(triggered()), this, SLOT(setFolderAsRead()));
-    connect(setFolderAsUnreadAction, SIGNAL(triggered()), this, SLOT(setFolderAsUnread()));
     connect(openContainingFolderAction, SIGNAL(triggered()), this, SLOT(openContainingFolder()));
-    connect(setFolderAsMangaAction, &QAction::triggered, this, &LibraryWindow::setFolderAsManga);
-    connect(setFolderAsNormalAction, &QAction::triggered, this, &LibraryWindow::setFolderAsNormal);
+
+    connect(setFolderAsNotCompletedAction, &QAction::triggered, this, [this] { setFolderCompleted(false); });
+    connect(setFolderAsCompletedAction, &QAction::triggered, this, [this] { setFolderCompleted(true); });
+    connect(setFolderAsReadAction, &QAction::triggered, this, [this] { setFolderRead(true); });
+    connect(setFolderAsUnreadAction, &QAction::triggered, this, [this] { setFolderRead(false); });
+    connect(setFolderAsMangaAction, &QAction::triggered, this, [this] { setFolderManga(true); });
+    connect(setFolderAsNormalAction, &QAction::triggered, this, [this] { setFolderManga(false); });
 
     connect(resetComicRatingAction, SIGNAL(triggered()), this, SLOT(resetComicRating()));
 
@@ -1565,7 +1566,7 @@ void LibraryWindow::deleteSelectedFolder()
     QString folderPath = QDir::cleanPath(currentPath() + relativePath);
 
     if (!selectedIndex.isValid())
-        QMessageBox::information(this, tr("No folder selected"), tr("Please, select a folder first"));
+        showNoFolderSelectedMessage();
     else {
         QString libraryPath = QDir::cleanPath(currentPath());
         if ((libraryPath == folderPath) || relativePath.isEmpty() || relativePath == "/")
@@ -2391,38 +2392,31 @@ void LibraryWindow::openContainingFolder()
     QDesktopServices::openUrl(QUrl("file:///" + path, QUrl::TolerantMode));
 }
 
-void LibraryWindow::setFolderAsNotCompleted()
+void LibraryWindow::setFolderCompleted(bool completed)
 {
-    //foldersModel->updateFolderCompletedStatus(foldersView->selectionModel()->selectedRows(),false);
-    foldersModel->updateFolderCompletedStatus(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), false);
+    const auto selectedIndex = getSelectedFolderIndex();
+    if (selectedIndex.isValid())
+        foldersModel->updateFolderCompletedStatus({ selectedIndex }, completed);
+    else
+        showNoFolderSelectedMessage();
 }
 
-void LibraryWindow::setFolderAsCompleted()
+void LibraryWindow::setFolderRead(bool read)
 {
-    //foldersModel->updateFolderCompletedStatus(foldersView->selectionModel()->selectedRows(),true);
-    foldersModel->updateFolderCompletedStatus(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), true);
+    const auto selectedIndex = getSelectedFolderIndex();
+    if (selectedIndex.isValid())
+        foldersModel->updateFolderFinishedStatus({ selectedIndex }, read);
+    else
+        showNoFolderSelectedMessage();
 }
 
-void LibraryWindow::setFolderAsRead()
+void LibraryWindow::setFolderManga(bool manga)
 {
-    //foldersModel->updateFolderFinishedStatus(foldersView->selectionModel()->selectedRows(),true);
-    foldersModel->updateFolderFinishedStatus(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), true);
-}
-
-void LibraryWindow::setFolderAsUnread()
-{
-    //foldersModel->updateFolderFinishedStatus(foldersView->selectionModel()->selectedRows(),false);
-    foldersModel->updateFolderFinishedStatus(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), false);
-}
-
-void LibraryWindow::setFolderAsManga()
-{
-    foldersModel->updateFolderManga(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), true);
-}
-
-void LibraryWindow::setFolderAsNormal()
-{
-    foldersModel->updateFolderManga(QModelIndexList() << foldersModelProxy->mapToSource(foldersView->currentIndex()), false);
+    const auto selectedIndex = getSelectedFolderIndex();
+    if (selectedIndex.isValid())
+        foldersModel->updateFolderManga({ selectedIndex }, manga);
+    else
+        showNoFolderSelectedMessage();
 }
 
 void LibraryWindow::exportLibrary(QString destPath)
@@ -2721,4 +2715,9 @@ YACReaderLibrarySourceContainer::SourceType LibraryWindow::currentSourceType() c
 QModelIndex LibraryWindow::currentSourceModelIndex() const
 {
     return historyController->currentSourceContainer().getSourceModelIndex();
+}
+
+void LibraryWindow::showNoFolderSelectedMessage()
+{
+    QMessageBox::information(this, tr("No folder selected"), tr("Please, select a folder first"));
 }
