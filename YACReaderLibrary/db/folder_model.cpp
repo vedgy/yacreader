@@ -341,7 +341,7 @@ void FolderModel::updateFolderCompletedStatus(const QModelIndexList &list, bool 
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    emit dataChanged(index(list.first().row(), FolderModel::Name), index(list.last().row(), FolderModel::Completed));
+    emit dataChanged(list.constFirst(), list.constLast(), { FolderModel::CompletedRole });
 }
 
 void FolderModel::updateFolderFinishedStatus(const QModelIndexList &list, bool status)
@@ -364,7 +364,7 @@ void FolderModel::updateFolderFinishedStatus(const QModelIndexList &list, bool s
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    emit dataChanged(index(list.first().row(), FolderModel::Name), index(list.last().row(), FolderModel::Completed));
+    emit dataChanged(list.constFirst(), list.constLast(), { FolderModel::FinishedRole });
 }
 
 void FolderModel::updateFolderManga(const QModelIndexList &list, bool manga)
@@ -395,7 +395,7 @@ void FolderModel::updateFolderManga(const QModelIndexList &list, bool manga)
     }
     QSqlDatabase::removeDatabase(connectionName);
 
-    emit dataChanged(index(list.first().row(), FolderModel::Name), index(list.last().row(), FolderModel::Manga));
+    emit dataChanged(list.constFirst(), list.constLast(), { FolderModel::MangaRole });
 }
 
 QStringList FolderModel::getSubfoldersNames(const QModelIndex &mi)

@@ -14,6 +14,25 @@ YACReaderFoldersView::YACReaderFoldersView(QWidget *parent)
     setItemDelegate(new YACReaderFoldersViewItemDeletegate(this));
 }
 
+QRect YACReaderFoldersView::visualRect(const QModelIndex &index) const
+{
+    auto rect = YACReaderTreeView::visualRect(index);
+    // YACReaderTreeView::visualRect(index) returns a rectangle with x>0, e.g. x=20 if
+    // index is valid. Whether or not YACReaderFoldersViewItemDeletegate::paint() draws a
+    // vertical line at x=0 depends on index's value for FolderModel::CompletedRole. When
+    // this value is changed via a shortcut, the vertical line does not (dis)appear until
+    // the entire index's row is updated (e.g. when the mouse cursor enters/leaves index's
+    // row or foldersView, or when foldersView receives/loses focus, or when foldersView's
+    // selection changes, or when foldersView's nodes are expanded/collapsed), because
+    // QAbstractItemView::update(index) passes rect=visualRect(index) to
+    // viewport()->update(rect). Reducing visualRect's x to 0 makes the vertical line
+    // (dis)appear as soon as index's value for FolderModel::CompletedRole is changed.
+    constexpr int minPaintedX { 0 };
+    if (index.isValid() && rect.x() > minPaintedX)
+        rect.setX(minPaintedX);
+    return rect;
+}
+
 void YACReaderFoldersView::dragEnterEvent(QDragEnterEvent *event)
 {
     YACReaderTreeView::dragEnterEvent(event);

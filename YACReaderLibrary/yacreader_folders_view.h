@@ -11,6 +11,8 @@ class YACReaderFoldersView : public YACReaderTreeView
 public:
     explicit YACReaderFoldersView(QWidget *parent = nullptr);
 
+    QRect visualRect(const QModelIndex &index) const override;
+
 signals:
     //Drops
     void copyComicsToFolder(QList<QPair<QString, QString>>, QModelIndex);
