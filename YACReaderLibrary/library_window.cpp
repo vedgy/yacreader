@@ -2642,31 +2642,10 @@ void LibraryWindow::deleteComicsFromList()
 
 void LibraryWindow::showFoldersContextMenu(const QPoint &point)
 {
-    QModelIndex sourceMI = foldersModelProxy->mapToSource(foldersView->indexAt(point));
-
-    bool isCompleted = sourceMI.data(FolderModel::CompletedRole).toBool();
-    bool isRead = sourceMI.data(FolderModel::FinishedRole).toBool();
-    bool isManga = sourceMI.data(FolderModel::MangaRole).toBool();
-
     QMenu menu;
-    //QMenu * folderMenu = new QMenu(tr("Folder"));
     menu.addAction(openContainingFolderAction);
     menu.addAction(updateFolderAction);
-    menu.addSeparator(); //-------------------------------
-    if (isCompleted)
-        menu.addAction(setFolderAsNotCompletedAction);
-    else
-        menu.addAction(setFolderAsCompletedAction);
-    menu.addSeparator(); //-------------------------------
-    if (isRead)
-        menu.addAction(setFolderAsUnreadAction);
-    else
-        menu.addAction(setFolderAsReadAction);
-    menu.addSeparator(); //-------------------------------
-    if (isManga)
-        menu.addAction(setFolderAsNormalAction);
-    else
-        menu.addAction(setFolderAsMangaAction);
+    addFolderStatusAndTypeActions(menu);
 
     menu.exec(foldersView->mapToGlobal(point));
 }
@@ -2720,4 +2699,25 @@ QModelIndex LibraryWindow::currentSourceModelIndex() const
 void LibraryWindow::showNoFolderSelectedMessage()
 {
     QMessageBox::information(this, tr("No folder selected"), tr("Please, select a folder first"));
+}
+
+void LibraryWindow::addFolderStatusAndTypeActions(QMenu &menu)
+{
+    const auto selectedIndex = getSelectedFolderIndex();
+    if (!selectedIndex.isValid())
+        return; // The root index does not support statuses and types.
+
+    const auto roleValue = [&selectedIndex](FolderModel::Roles role) {
+        return selectedIndex.data(role).toBool();
+    };
+    const bool isCompleted = roleValue(FolderModel::CompletedRole);
+    const bool isRead = roleValue(FolderModel::FinishedRole);
+    const bool isManga = roleValue(FolderModel::MangaRole);
+
+    menu.addSeparator();
+    menu.addAction(isCompleted ? setFolderAsNotCompletedAction : setFolderAsCompletedAction);
+    menu.addSeparator();
+    menu.addAction(isRead ? setFolderAsUnreadAction : setFolderAsReadAction);
+    menu.addSeparator();
+    menu.addAction(isManga ? setFolderAsNormalAction : setFolderAsMangaAction);
 }

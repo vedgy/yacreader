@@ -423,6 +423,8 @@ private:
 
     void showNoFolderSelectedMessage();
 
+    void addFolderStatusAndTypeActions(QMenu &menu);
+
     YACReader::SearchModifiers lastSearchModifiers;
     QString lastSearchFilter;
 
