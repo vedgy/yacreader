@@ -420,6 +420,9 @@ private:
     //! @return The selected foldersModel's (source) folder index or an empty index
     //! if no folder is currently selected.
     QModelIndex getSelectedFolderIndex() const;
+    //! @return The selected listsModel's (source) reading list index or an empty index
+    //! if no list is currently selected.
+    QModelIndex getSelectedReadingListIndex() const;
 
     void showNoFolderSelectedMessage();
 

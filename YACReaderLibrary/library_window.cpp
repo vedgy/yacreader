@@ -1521,6 +1521,13 @@ QModelIndex LibraryWindow::getSelectedFolderIndex() const
         return QModelIndex();
 }
 
+QModelIndex LibraryWindow::getSelectedReadingListIndex() const
+{
+    if (listsView->selectionModel()->hasSelection())
+        return listsModelProxy->mapToSource(listsView->currentIndex());
+    return QModelIndex();
+}
+
 void LibraryWindow::enableNeededActions()
 {
     if (foldersModel->rowCount(QModelIndex()) > 0)
@@ -1612,46 +1619,46 @@ void LibraryWindow::errorDeletingFolder()
 
 void LibraryWindow::addNewReadingList()
 {
-    QModelIndexList selectedLists = listsView->selectionModel()->selectedIndexes();
-    QModelIndex sourceMI;
-    if (!selectedLists.isEmpty())
-        sourceMI = listsModelProxy->mapToSource(selectedLists.at(0));
+    const QModelIndex selectedIndex = getSelectedReadingListIndex();
+    if (selectedIndex.isValid() && listsModel->isReadingSubList(selectedIndex))
+        return; // Only one sublist level is supported.
 
-    if (selectedLists.isEmpty() || !listsModel->isReadingSubList(sourceMI)) {
-        bool ok;
-        QString newListName = QInputDialog::getText(this, tr("Add new reading lists"),
-                                                    tr("List name:"), QLineEdit::Normal,
-                                                    "", &ok);
-        if (ok) {
-            if (selectedLists.isEmpty() || !listsModel->isReadingList(sourceMI))
-                listsModel->addReadingList(newListName); //top level
-            else {
-                listsModel->addReadingListAt(newListName, sourceMI); //sublist
-            }
-        }
-    }
+    bool ok;
+    QString newListName = QInputDialog::getText(this, tr("Add new reading lists"),
+                                                tr("List name:"), QLineEdit::Normal,
+                                                "", &ok);
+    if (!ok)
+        return;
+
+    if (selectedIndex.isValid() && listsModel->isReadingList(selectedIndex))
+        listsModel->addReadingListAt(newListName, selectedIndex); //sublist
+    else
+        listsModel->addReadingList(newListName); //top level
 }
 
 void LibraryWindow::deleteSelectedReadingList()
 {
-    QModelIndexList selectedLists = listsView->selectionModel()->selectedIndexes();
-    if (!selectedLists.isEmpty()) {
-        QModelIndex mi = listsModelProxy->mapToSource(selectedLists.at(0));
-        if (listsModel->isEditable(mi)) {
-            int ret = QMessageBox::question(this, tr("Delete list/label"), tr("The selected item will be deleted, your comics or folders will NOT be deleted from your disk. Are you sure?"), QMessageBox::Yes, QMessageBox::No);
-            if (ret == QMessageBox::Yes) {
-                listsModel->deleteItem(mi);
-                if (status == LibraryWindow::Searching) {
-                    // Update history with the current valid index but remain in search mode.
-                    const auto index = listsModelProxy->mapToSource(listsView->currentIndex());
-                    historyController->updateHistory(
-                            YACReaderLibrarySourceContainer(index, YACReaderLibrarySourceContainer::List));
-                    setToolbarTitle(index);
-                } else {
-                    navigationController->reselectCurrentList();
-                }
-            }
-        }
+    const QModelIndex selectedIndex = getSelectedReadingListIndex();
+    if (!selectedIndex.isValid() || !listsModel->isEditable(selectedIndex))
+        return; // Nothing to delete or cannot delete.
+
+    const int ret = QMessageBox::question(
+            this, tr("Delete list/label"),
+            tr("The selected item will be deleted, your comics or folders will NOT be deleted from your disk. Are you sure?"),
+            QMessageBox::Yes, QMessageBox::No);
+    if (ret != QMessageBox::Yes)
+        return;
+
+    listsModel->deleteItem(selectedIndex);
+
+    if (status == LibraryWindow::Searching) {
+        // Update history with the current valid index but remain in search mode.
+        const auto index = listsModelProxy->mapToSource(listsView->currentIndex());
+        historyController->updateHistory(
+                YACReaderLibrarySourceContainer(index, YACReaderLibrarySourceContainer::List));
+        setToolbarTitle(index);
+    } else {
+        navigationController->reselectCurrentList();
     }
 }
 
@@ -1671,20 +1678,17 @@ void LibraryWindow::showAddNewLabelDialog()
 //TODO implement editors in treeview
 void LibraryWindow::showRenameCurrentList()
 {
-    QModelIndexList selectedLists = listsView->selectionModel()->selectedIndexes();
-    if (!selectedLists.isEmpty()) {
-        QModelIndex mi = listsModelProxy->mapToSource(selectedLists.at(0));
-        if (listsModel->isEditable(mi)) {
-            bool ok;
-            const QString currentName = listsModel->name(mi);
-            QString newListName = QInputDialog::getText(this, tr("Rename list name"),
-                                                        tr("List name:"), QLineEdit::Normal,
-                                                        currentName, &ok);
+    const QModelIndex selectedIndex = getSelectedReadingListIndex();
+    if (!selectedIndex.isValid() || !listsModel->isEditable(selectedIndex))
+        return; // Nothing to rename or cannot rename.
 
-            if (ok && newListName != currentName)
-                listsModel->rename(mi, newListName);
-        }
-    }
+    bool ok;
+    const QString currentName = listsModel->name(selectedIndex);
+    QString newListName = QInputDialog::getText(this, tr("Rename list name"),
+                                                tr("List name:"), QLineEdit::Normal,
+                                                currentName, &ok);
+    if (ok && newListName != currentName)
+        listsModel->rename(selectedIndex, newListName);
 }
 
 void LibraryWindow::addSelectedComicsToFavorites()
