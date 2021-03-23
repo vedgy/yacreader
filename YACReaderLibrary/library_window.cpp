@@ -1514,7 +1514,7 @@ QModelIndex LibraryWindow::getCurrentFolderIndex() const
 
 QModelIndex LibraryWindow::getSelectedFolderIndex() const
 {
-    if (foldersView->selectionModel()->selectedRows().length() > 0)
+    if (foldersView->selectionModel()->hasSelection())
         return foldersModelProxy->mapToSource(foldersView->currentIndex());
     else
         return QModelIndex();
