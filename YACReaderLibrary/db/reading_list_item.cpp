@@ -177,6 +177,13 @@ void ReadingListItem::removeChild(ReadingListItem *item)
     childItems.removeOne(item);
 }
 
+void ReadingListItem::moveChild(int sourceRow, int destinationRow)
+{
+    // Adjust destinationRow because the second argument to QList::move() is the
+    // moved item's final position, which is shifted when moving down.
+    childItems.move(sourceRow, destinationRow - (sourceRow < destinationRow));
+}
+
 qulonglong ReadingListItem::getId() const
 {
     if (itemData.count() > Id)

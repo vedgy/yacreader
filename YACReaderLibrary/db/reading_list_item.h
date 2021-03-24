@@ -73,6 +73,11 @@ public:
     int insertionPosition(const ReadingListItem *item) const;
     void insertChild(ReadingListItem *item, int pos);
     void removeChild(ReadingListItem *item);
+    //! @brief Moves the child at row @p sourceRow just before the child at row
+    //! @p destinationRow or to the end if @p destinationRow equals childCount().
+    //! @note The destination row here is off by one compared to QList::move()
+    //! when moving down.
+    void moveChild(int sourceRow, int destinationRow);
     qulonglong getId() const override;
     QString name() const;
     void setName(const QString &name);

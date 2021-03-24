@@ -311,15 +311,10 @@ bool ReadingListModel::dropSublist(const QMimeData *data, Qt::DropAction action,
     }
 
     auto parentItem = static_cast<ReadingListItem *>(destParent.internalPointer());
-    ReadingListItem *child = parentItem->child(sourceRow);
-    parentItem->removeChild(child);
-    if (destRow > sourceRow)
-        --destRow; // The item at destRow was shifted up when child was removed => sync the index.
-    parentItem->insertChild(child, destRow);
-
+    parentItem->moveChild(sourceRow, destRow);
     reorderingChildren(parentItem->children());
-    endMoveRows();
 
+    endMoveRows();
     return true;
 }
 
