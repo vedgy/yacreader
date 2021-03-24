@@ -290,7 +290,8 @@ bool ReadingListModel::dropSublist(const QMimeData *data, Qt::DropAction action,
 
     QLOG_DEBUG() << "dropped : " << sublistsRows;
 
-    int sourceRow = sublistsRows.at(0).first;
+    Q_ASSERT_X(sublistsRows.size() == 1, Q_FUNC_INFO, "Moving multiple sublists is unsupported.");
+    const int sourceRow = sublistsRows.constFirst().first;
     int destRow = row;
     QModelIndex destParent = parent;
     if (row == -1) {
