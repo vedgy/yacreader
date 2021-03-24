@@ -296,24 +296,29 @@ bool ReadingListModel::dropSublist(const QMimeData *data, Qt::DropAction action,
     int destRow = row;
     QModelIndex destParent = parent;
     if (row == -1) {
-        QLOG_DEBUG() << "droping inside parent";
-        destRow = parent.row();
+        QLOG_DEBUG() << "dropping inside another sublist => move past it since sublists don't nest";
+        // Increment destRow when moving down in order to move the sublist from sourceRow past
+        // (not before) the sublist where it was dropped (parent). This behavior makes moving
+        // a sublist to the beginning or the end of its parent reading list easier to the user.
+        destRow = parent.row() + (sourceRow < parent.row());
         destParent = parent.parent();
     }
     QLOG_DEBUG() << "move " << sourceRow << "-" << destRow;
 
-    if (sourceRow == destRow)
+    if (!beginMoveRows(destParent, sourceRow, sourceRow, destParent, destRow)) {
+        QLOG_DEBUG() << "aborting the move";
         return false;
-
-    //beginMoveRows(destParent,sourceRow,sourceRow,destParent,destRow);
+    }
 
     auto parentItem = static_cast<ReadingListItem *>(destParent.internalPointer());
     ReadingListItem *child = parentItem->child(sourceRow);
     parentItem->removeChild(child);
+    if (destRow > sourceRow)
+        --destRow; // The item at destRow was shifted up when child was removed => sync the index.
     parentItem->insertChild(child, destRow);
 
     reorderingChildren(parentItem->children());
-    //endMoveRows();
+    endMoveRows();
 
     return true;
 }
