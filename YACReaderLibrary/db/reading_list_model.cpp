@@ -184,9 +184,10 @@ QModelIndex ReadingListModel::parent(const QModelIndex &index) const
 
 bool ReadingListModel::canDropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) const
 {
-    Q_UNUSED(action);
+    Q_UNUSED(action)
+    Q_UNUSED(column)
 
-    QLOG_DEBUG() << "trying to drop into row = " << row << "column column = " << column << "parent" << parent;
+    //QLOG_DEBUG() << "trying to drop into row = " << row << "column column = " << column << "parent" << parent;
 
     if (row == -1)
         return false;
