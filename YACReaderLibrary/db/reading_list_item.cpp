@@ -124,7 +124,7 @@ ReadingListItem::ReadingListItem(const QList<QVariant> &data, ReadingListItem *p
 
 QIcon ReadingListItem::getIcon() const
 {
-    if (parent->getId() == 0)
+    if (parent->isRoot())
         return YACReader::noHighlightedIcon(":/images/lists/list.png"); //top level list
     else
 #ifdef Q_OS_MAC
@@ -149,16 +149,14 @@ void ReadingListItem::insertChild(ReadingListItem *item)
     insertChild(item, insertionPosition(item));
 }
 
-//items are sorted by order
 int ReadingListItem::insertionPosition(const ReadingListItem *item) const
 {
-    if (getId() == 0) //sort by name, top level child
-    {
+    if (isRoot()) { //top-level reading lists are sorted by name
         int i = 0;
         while (i < childItems.length() && naturalSortLessThanCI(childItems.at(i)->name(), item->name()))
             i++;
         return i;
-    } else {
+    } else { //sublists are sorted by ordering
         int i = 0;
         while (i < childItems.length() && (childItems.at(i)->getOrdering() < item->getOrdering()))
             i++;

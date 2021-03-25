@@ -78,6 +78,8 @@ public:
     //! @note The destination row here is off by one compared to QList::move()
     //! when moving down.
     void moveChild(int sourceRow, int destinationRow);
+
+    bool isRoot() const { return getId() == 0; }
     qulonglong getId() const override;
     QString name() const;
     void setName(const QString &name);
