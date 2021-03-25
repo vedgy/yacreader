@@ -1675,11 +1675,12 @@ void LibraryWindow::showRenameCurrentList()
         QModelIndex mi = listsModelProxy->mapToSource(selectedLists.at(0));
         if (listsModel->isEditable(mi)) {
             bool ok;
+            const QString currentName = listsModel->name(mi);
             QString newListName = QInputDialog::getText(this, tr("Rename list name"),
                                                         tr("List name:"), QLineEdit::Normal,
-                                                        listsModel->name(mi), &ok);
+                                                        currentName, &ok);
 
-            if (ok)
+            if (ok && newListName != currentName)
                 listsModel->rename(mi, newListName);
         }
     }
