@@ -87,9 +87,16 @@ private:
     void setupLabels(QSqlDatabase &db);
     void setupReadingLists(QSqlDatabase &db);
     void insertLabelIntoList(LabelItem *item);
+    //! @return The position at which insertLabelIntoList(item) would insert an item
+    //! with color @p itemColor and name @p itemName.
+    int labelInsertionPosition(YACReader::LabelColors itemColor, const QString &itemName) const;
     //! @return The position at which insertLabelIntoList(item) would insert @p item.
     int labelInsertionPosition(const LabelItem *item) const;
     void insertLabelIntoList(LabelItem *item, int pos);
+    //! @brief Moves the label at @p sourcePos just before the label at @p destinationPos
+    //! or to the end of the list if @p destinationPos equals labels.size().
+    //! @note The destination position here is off by one compared to QList::move() when moving down.
+    void moveLabel(int sourcePos, int destinationPos);
     void reorderingChildren(QList<ReadingListItem *> children);
 
     int firstSeparatorRow() const;

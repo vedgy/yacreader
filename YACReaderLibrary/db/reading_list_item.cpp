@@ -149,19 +149,25 @@ void ReadingListItem::insertChild(ReadingListItem *item)
     insertChild(item, insertionPosition(item));
 }
 
+int ReadingListItem::topLevelInsertionPosition(const QString &itemName) const
+{
+    Q_ASSERT(isRoot());
+    //top-level reading lists are sorted by name
+    int i = 0;
+    while (i < childItems.length() && naturalSortLessThanCI(childItems.at(i)->name(), itemName))
+        i++;
+    return i;
+}
+
 int ReadingListItem::insertionPosition(const ReadingListItem *item) const
 {
-    if (isRoot()) { //top-level reading lists are sorted by name
-        int i = 0;
-        while (i < childItems.length() && naturalSortLessThanCI(childItems.at(i)->name(), item->name()))
-            i++;
-        return i;
-    } else { //sublists are sorted by ordering
-        int i = 0;
-        while (i < childItems.length() && (childItems.at(i)->getOrdering() < item->getOrdering()))
-            i++;
-        return i;
-    }
+    if (isRoot())
+        return topLevelInsertionPosition(item->name());
+    //sublists are sorted by ordering
+    int i = 0;
+    while (i < childItems.length() && childItems.at(i)->getOrdering() < item->getOrdering())
+        i++;
+    return i;
 }
 
 void ReadingListItem::insertChild(ReadingListItem *item, int pos)

@@ -69,6 +69,10 @@ public:
     int row() const;
     ReadingListItem *child(int row);
     void insertChild(ReadingListItem *item);
+    //! @return The position at which insertChild(item) would insert an item
+    //! with name @p itemName.
+    //! @pre this->isRoot() is true.
+    int topLevelInsertionPosition(const QString &itemName) const;
     //! @return The position at which insertChild(item) would insert @p item.
     int insertionPosition(const ReadingListItem *item) const;
     void insertChild(ReadingListItem *item, int pos);

@@ -475,23 +475,53 @@ void ReadingListModel::rename(const QModelIndex &mi, const QString &name)
         return;
     YACReader::DatabaseHelper dbh(_databasePath);
 
-    auto item = static_cast<ListItem *>(mi.internalPointer());
+    const auto item = static_cast<ListItem *>(mi.internalPointer());
     if (typeid(*item) == typeid(ReadingListItem)) {
-        auto rli = static_cast<ReadingListItem *>(item);
-        rli->setName(name);
-        dbh.renameList(item->getId(), name);
+        const auto rli = static_cast<ReadingListItem *>(item);
+        const auto renameItem = [&] {
+            rli->setName(name);
+            dbh.renameList(rli->getId(), name);
+        };
 
-        if (rli->parent->getId() != 0) {
-            //TODO
-            //move row depending on the name
-        } else
-            emit dataChanged(index(mi.row(), 0), index(mi.row(), 0));
+        if (rli->parent == rootItem) {
+            const int insertionPos = rootItem->topLevelInsertionPosition(name);
+            const int modelDestinationRow = firstReadingListRow() + insertionPos;
+            if (beginMoveRows(QModelIndex(), mi.row(), mi.row(), QModelIndex(), modelDestinationRow)) {
+                // The item has to be moved to keep the top-level reading lists sorted.
+                const int currentPos = rli->row();
+                renameItem();
+                rootItem->moveChild(currentPos, insertionPos);
+                endMoveRows();
+                return;
+            }
+        }
+        // The item is in the correct position or is a sublist (sublists are not
+        // sorted by name) => just rename it.
+        renameItem();
     } else if (typeid(*item) == typeid(LabelItem)) {
-        auto li = static_cast<LabelItem *>(item);
-        li->setName(name);
-        dbh.renameLabel(item->getId(), name);
-        emit dataChanged(index(mi.row(), 0), index(mi.row(), 0));
+        const auto li = static_cast<LabelItem *>(item);
+        const auto renameItem = [&] {
+            li->setName(name);
+            dbh.renameLabel(li->getId(), name);
+        };
+
+        const int insertionPos = labelInsertionPosition(li->colorid(), name);
+        const int modelDestinationRow = firstLabelRow() + insertionPos;
+        if (beginMoveRows(QModelIndex(), mi.row(), mi.row(), QModelIndex(), modelDestinationRow)) {
+            // The item has to be moved to keep the labels sorted.
+            const int currentPos = labels.indexOf(li);
+            renameItem();
+            moveLabel(currentPos, insertionPos);
+            endMoveRows();
+            return;
+        }
+        // The item is in the correct position => just rename it.
+        renameItem();
+    } else {
+        return; // Nothing to do.
     }
+
+    emit dataChanged(mi, mi, { Qt::DisplayRole }); // The item was renamed in place, not moved.
 }
 
 void ReadingListModel::deleteItem(const QModelIndex &mi)
@@ -660,21 +690,32 @@ void ReadingListModel::insertLabelIntoList(LabelItem *item)
     insertLabelIntoList(item, labelInsertionPosition(item));
 }
 
-int ReadingListModel::labelInsertionPosition(const LabelItem *item) const
+int ReadingListModel::labelInsertionPosition(YACReader::LabelColors itemColor, const QString &itemName) const
 {
     int i = 0;
-    const auto itemColor = item->colorid();
     while (i < labels.count() && labels.at(i)->colorid() < itemColor)
         ++i;
-    while (i < labels.count() && labels.at(i)->colorid() == itemColor && naturalSortLessThanCI(labels.at(i)->name(), item->name()))
+    while (i < labels.count() && labels.at(i)->colorid() == itemColor && naturalSortLessThanCI(labels.at(i)->name(), itemName))
         ++i;
     return i;
+}
+
+int ReadingListModel::labelInsertionPosition(const LabelItem *item) const
+{
+    return labelInsertionPosition(item->colorid(), item->name());
 }
 
 void ReadingListModel::insertLabelIntoList(LabelItem *item, int pos)
 {
     QLOG_DEBUG() << "inserting label" << item->name() << "at" << pos;
     labels.insert(pos, item);
+}
+
+void ReadingListModel::moveLabel(int sourcePos, int destinationPos)
+{
+    // Adjust destinationPos because the second argument to QList::move() is the
+    // moved item's final position, which is shifted when moving down.
+    labels.move(sourcePos, destinationPos - (sourcePos < destinationPos));
 }
 
 void ReadingListModel::reorderingChildren(QList<ReadingListItem *> children)
