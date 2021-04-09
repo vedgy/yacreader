@@ -11,8 +11,6 @@
 
 #include <typeinfo>
 
-static constexpr int separatorCount { 2 };
-
 ReadingListModel::ReadingListModel(QObject *parent)
     : QAbstractItemModel(parent), rootItem(0)
 {
@@ -24,7 +22,7 @@ int ReadingListModel::rowCount(const QModelIndex &parent) const
 {
     if (!parent.isValid()) //TOP
     {
-        return specialLists.count() + labels.count() + rootItem->childCount() + separatorCount;
+        return firstReadingListRow() + rootItem->childCount();
     } else {
         auto item = static_cast<ListItem *>(parent.internalPointer());
 
@@ -132,17 +130,17 @@ QModelIndex ReadingListModel::index(int row, int column, const QModelIndex &pare
         if (rowIsSpecialList(row, parent))
             return createIndex(row, column, specialLists.at(row));
 
-        if (row == specialLists.count())
+        if (row == firstSeparatorRow())
             return createIndex(row, column, separator1);
 
         if (rowIsLabel(row, parent))
-            return createIndex(row, column, labels.at(row - specialLists.count() - 1));
+            return createIndex(row, column, labels.at(row - firstLabelRow()));
 
-        if (row == specialLists.count() + labels.count() + 1)
+        if (row == secondSeparatorRow())
             return createIndex(row, column, separator2);
 
         if (rowIsReadingList(row, parent))
-            return createIndex(row, column, rootItem->child(row - (specialLists.count() + labels.count() + separatorCount)));
+            return createIndex(row, column, rootItem->child(row - firstReadingListRow()));
     } else //sublist
     {
         ReadingListItem *parentItem;
@@ -174,7 +172,7 @@ QModelIndex ReadingListModel::parent(const QModelIndex &index) const
         auto childItem = static_cast<ReadingListItem *>(index.internalPointer());
         ReadingListItem *parent = childItem->parent;
         if (parent->getId() != 0)
-            return createIndex(parent->row() + specialLists.count() + labels.count() + 2, 0, parent);
+            return createIndex(firstReadingListRow() + parent->row(), 0, parent);
     }
 
     return QModelIndex();
@@ -380,8 +378,7 @@ void ReadingListModel::addNewLabel(const QString &name, YACReader::LabelColors c
         const auto newItem = new LabelItem({ name, YACReader::colorToName(color), id, color });
         const int insertionPosition = labelInsertionPosition(newItem);
 
-        constexpr int separatorsBeforeLabels { 1 };
-        const int modelRow = specialLists.size() + separatorsBeforeLabels + insertionPosition;
+        const int modelRow = firstLabelRow() + insertionPosition;
         beginInsertRows(QModelIndex(), modelRow, modelRow);
         insertLabelIntoList(newItem, insertionPosition);
         endInsertRows();
@@ -401,7 +398,7 @@ void ReadingListModel::addReadingList(const QString &name)
         const auto newItem = new ReadingListItem({ name, id, false, true, 0 });
         const int insertionPosition = rootItem->insertionPosition(newItem);
 
-        const int modelRow = specialLists.size() + labels.size() + separatorCount + insertionPosition;
+        const int modelRow = firstReadingListRow() + insertionPosition;
         beginInsertRows(QModelIndex(), modelRow, modelRow);
         rootItem->insertChild(newItem, insertionPosition);
         items.insert(id, newItem);
@@ -692,49 +689,53 @@ void ReadingListModel::reorderingChildren(QList<ReadingListItem *> children)
     dbh.reassignOrderToSublists(childrenIds);
 }
 
+int ReadingListModel::firstSeparatorRow() const
+{
+    return specialLists.size();
+}
+
+int ReadingListModel::firstLabelRow() const
+{
+    return firstSeparatorRow() + 1;
+}
+
+int ReadingListModel::secondSeparatorRow() const
+{
+    return firstReadingListRow() - 1;
+}
+
+int ReadingListModel::firstReadingListRow() const
+{
+    constexpr int separatorCount { 2 };
+    return specialLists.size() + labels.size() + separatorCount;
+}
+
 bool ReadingListModel::rowIsSpecialList(int row, const QModelIndex &parent) const
 {
     if (parent.isValid())
         return false; //by now no sublists in special list
-
-    if (row >= 0 && row < specialLists.count())
-        return true;
-
-    return false;
+    return row >= 0 && row < specialLists.count();
 }
 
 bool ReadingListModel::rowIsLabel(int row, const QModelIndex &parent) const
 {
     if (parent.isValid())
         return false; //by now no sublists in labels
-
-    if (row > specialLists.count() && row <= specialLists.count() + labels.count())
-        return true;
-
-    return false;
+    return row >= firstLabelRow() && row < secondSeparatorRow();
 }
 
 bool ReadingListModel::rowIsReadingList(int row, const QModelIndex &parent) const
 {
     if (parent.isValid())
         return true; //only lists with sublists
-    if (row >= specialLists.count() + labels.count() + separatorCount)
-        return true;
-    return false;
+    return row >= firstReadingListRow();
 }
 
 bool ReadingListModel::rowIsSeparator(int row, const QModelIndex &parent) const
 {
     if (parent.isValid())
         return false; //all separators are at the top level
-
-    if (row == specialLists.count())
-        return true;
-
-    if (row == specialLists.count() + labels.count() + 1)
-        return true;
-
-    return false;
+    return row == firstSeparatorRow() || row == secondSeparatorRow();
 }
 
 ReadingListModelProxy::ReadingListModelProxy(QObject *parent)

@@ -92,6 +92,11 @@ private:
     void insertLabelIntoList(LabelItem *item, int pos);
     void reorderingChildren(QList<ReadingListItem *> children);
 
+    int firstSeparatorRow() const;
+    int firstLabelRow() const;
+    int secondSeparatorRow() const;
+    int firstReadingListRow() const;
+
     bool rowIsSpecialList(int row, const QModelIndex &parent = QModelIndex()) const;
     bool rowIsLabel(int row, const QModelIndex &parent = QModelIndex()) const;
     bool rowIsReadingList(int row, const QModelIndex &parent = QModelIndex()) const;
