@@ -1684,7 +1684,7 @@ void LibraryWindow::showRenameCurrentList()
 
     bool ok;
     const QString currentName = listsModel->name(selectedIndex);
-    QString newListName = QInputDialog::getText(this, tr("Rename list name"),
+    QString newListName = QInputDialog::getText(this, tr("Rename list/label"),
                                                 tr("List name:"), QLineEdit::Normal,
                                                 currentName, &ok);
     if (ok && newListName != currentName)
