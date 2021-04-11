@@ -9,11 +9,12 @@
 #include <QCoreApplication>
 #include <QTextStream>
 #include <QSqlDatabase>
+#include <QSqlError>
 #include <QSqlRecord>
 #include <QSqlQuery>
 
 #include <algorithm>
-#include <limits>
+#include <utility>
 
 #include "reading_list.h"
 #include "library_item.h"
@@ -1003,7 +1004,7 @@ void DBHelper::renameList(qulonglong id, const QString &name, QSqlDatabase &db)
     renameLabelQuery.exec();
 }
 
-void DBHelper::reasignOrderToSublists(QList<qulonglong> ids, QSqlDatabase &db)
+void DBHelper::reassignOrderToSublists(const QList<qulonglong> &ids, QSqlDatabase &db)
 {
     QSqlQuery updateOrdering(db);
     updateOrdering.prepare("UPDATE reading_list SET "
@@ -1011,7 +1012,7 @@ void DBHelper::reasignOrderToSublists(QList<qulonglong> ids, QSqlDatabase &db)
                            "WHERE id = :id");
     db.transaction();
     int order = 0;
-    foreach (qulonglong id, ids) {
+    for (auto id : ids) {
         updateOrdering.bindValue(":ordering", order++);
         updateOrdering.bindValue(":id", id);
         updateOrdering.exec();
@@ -1020,7 +1021,7 @@ void DBHelper::reasignOrderToSublists(QList<qulonglong> ids, QSqlDatabase &db)
     db.commit();
 }
 
-void DBHelper::reasignOrderToComicsInFavorites(QList<qulonglong> comicIds, QSqlDatabase &db)
+void DBHelper::reassignOrderToComicsInFavorites(const QList<qulonglong> &comicIds, QSqlDatabase &db)
 {
     QSqlQuery updateOrdering(db);
     updateOrdering.prepare("UPDATE comic_default_reading_list SET "
@@ -1028,7 +1029,7 @@ void DBHelper::reasignOrderToComicsInFavorites(QList<qulonglong> comicIds, QSqlD
                            "WHERE comic_id = :comic_id AND default_reading_list_id = 1");
     db.transaction();
     int order = 0;
-    foreach (qulonglong id, comicIds) {
+    for (auto id : comicIds) {
         updateOrdering.bindValue(":ordering", order++);
         updateOrdering.bindValue(":comic_id", id);
         updateOrdering.exec();
@@ -1037,7 +1038,7 @@ void DBHelper::reasignOrderToComicsInFavorites(QList<qulonglong> comicIds, QSqlD
     db.commit();
 }
 
-void DBHelper::reasignOrderToComicsInLabel(qulonglong labelId, QList<qulonglong> comicIds, QSqlDatabase &db)
+void DBHelper::reassignOrderToComicsInLabel(qulonglong labelId, const QList<qulonglong> &comicIds, QSqlDatabase &db)
 {
     QSqlQuery updateOrdering(db);
     updateOrdering.prepare("UPDATE comic_label SET "
@@ -1045,7 +1046,7 @@ void DBHelper::reasignOrderToComicsInLabel(qulonglong labelId, QList<qulonglong>
                            "WHERE comic_id = :comic_id AND label_id = :label_id");
     db.transaction();
     int order = 0;
-    foreach (qulonglong id, comicIds) {
+    for (auto id : comicIds) {
         updateOrdering.bindValue(":ordering", order++);
         updateOrdering.bindValue(":comic_id", id);
         updateOrdering.bindValue(":label_id", labelId);
@@ -1055,7 +1056,7 @@ void DBHelper::reasignOrderToComicsInLabel(qulonglong labelId, QList<qulonglong>
     db.commit();
 }
 
-void DBHelper::reasignOrderToComicsInReadingList(qulonglong readingListId, QList<qulonglong> comicIds, QSqlDatabase &db)
+void DBHelper::reassignOrderToComicsInReadingList(qulonglong readingListId, const QList<qulonglong> &comicIds, QSqlDatabase &db)
 {
     QSqlQuery updateOrdering(db);
     updateOrdering.prepare("UPDATE comic_reading_list SET "
@@ -1063,7 +1064,7 @@ void DBHelper::reasignOrderToComicsInReadingList(qulonglong readingListId, QList
                            "WHERE comic_id = :comic_id AND reading_list_id = :reading_list_id");
     db.transaction();
     int order = 0;
-    foreach (qulonglong id, comicIds) {
+    for (auto id : comicIds) {
         updateOrdering.bindValue(":ordering", order++);
         updateOrdering.bindValue(":comic_id", id);
         updateOrdering.bindValue(":reading_list_id", readingListId);
@@ -1519,7 +1520,7 @@ QList<Label> DBHelper::getLabels(qulonglong libraryId)
     return labels;
 }
 
-void DBHelper::updateFolderTreeManga(qulonglong id, QSqlDatabase &db, bool manga)
+void DBHelper::updateFolderTreeManga(qulonglong id, bool manga, QSqlDatabase &db)
 {
     QSqlQuery updateFolderQuery(db);
     updateFolderQuery.prepare("UPDATE folder "
@@ -1545,7 +1546,7 @@ void DBHelper::updateFolderTreeManga(qulonglong id, QSqlDatabase &db, bool manga
     int childFolderIdPos = getSubFoldersQuery.record().indexOf("id");
 
     while (getSubFoldersQuery.next()) {
-        updateFolderTreeManga(getSubFoldersQuery.value(childFolderIdPos).toULongLong(), db, manga);
+        updateFolderTreeManga(getSubFoldersQuery.value(childFolderIdPos).toULongLong(), manga, db);
     }
 }
 
@@ -1669,13 +1670,13 @@ ComicDB DBHelper::loadComic(qulonglong id, QSqlDatabase &db)
     return comic;
 }
 
-ComicDB DBHelper::loadComic(QString cname, QString cpath, QString chash, QSqlDatabase &database)
+ComicDB DBHelper::loadComic(QString cname, QString cpath, const QString &chash, QSqlDatabase &database)
 {
     ComicDB comic;
 
     //comic.parentId = cparentId;
-    comic.name = cname;
-    comic.path = cpath;
+    comic.name = std::move(cname);
+    comic.path = std::move(cpath);
 
     comic.info = DBHelper::loadComicInfo(chash, database);
 
@@ -1689,7 +1690,7 @@ ComicDB DBHelper::loadComic(QString cname, QString cpath, QString chash, QSqlDat
     return comic;
 }
 
-ComicInfo DBHelper::loadComicInfo(QString hash, QSqlDatabase &db)
+ComicInfo DBHelper::loadComicInfo(const QString &hash, QSqlDatabase &db)
 {
     ComicInfo comicInfo;
 
